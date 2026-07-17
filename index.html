@@ -532,6 +532,11 @@
         <button class="btn btn-primary" onclick="login()">Google 계정으로 인증</button>
         <button class="btn btn-light" onclick="fillDemo()">시연용 계정 자동 입력</button>
       </div>
+      <div style="margin-top:20px; display:flex; justify-content:center; gap:15px; font-size:13px;">
+        <a href="#" onclick="openModal('privacyModal'); return false;" style="color:var(--muted); font-weight:bold;">개인정보처리방침</a>
+        <a href="#" onclick="openModal('termsModal'); return false;" style="color:var(--muted); font-weight:bold;">사용약관</a>
+        <a href="#" onclick="openModal('guideModal'); return false;" style="color:var(--muted); font-weight:bold;">사용방법 안내</a>
+      </div>
 
       <div class="notice">
         학교용 계정으로 로그인하는 흐름을 보여주는 시연 페이지입니다.<br>
@@ -573,20 +578,36 @@
 
     <section class="cards">
       <div class="card-item">
-        <div class="card-title">소속학교 · 작성자</div>
+        <div class="card-title">01 소속학교·이름 표기</div>
         <div class="card-value">서울풍납초등학교<br>교사 김규태</div>
       </div>
       <div class="card-item">
-        <div class="card-title">GitHub 레포지토리 주소</div>
-        <div class="card-value"><a id="repoLink" target="_blank"></a></div>
+        <div class="card-title">02 개인정보처리방침</div>
+        <div class="card-value"><button class="btn btn-light" style="width:100%; padding:8px; font-size:13px;" onclick="openModal('privacyModal')">방침 보기</button></div>
       </div>
       <div class="card-item">
-        <div class="card-title">배포 주소</div>
-        <div class="card-value"><a id="deployLink" target="_blank"></a></div>
+        <div class="card-title">03 사용약관</div>
+        <div class="card-value"><button class="btn btn-light" style="width:100%; padding:8px; font-size:13px;" onclick="openModal('termsModal')">약관 보기</button></div>
       </div>
       <div class="card-item">
-        <div class="card-title">핵심 기능</div>
-        <div class="card-value">교직원 인증 · 컷 수 선택 · 긴 글 입력 · 컷별 이야기 생성</div>
+        <div class="card-title">04 GitHub 레포지토리 주소</div>
+        <div class="card-value"><a id="repoLink" target="_blank" style="font-size:13px; word-break:break-all;"></a></div>
+      </div>
+      <div class="card-item">
+        <div class="card-title">05 Firebase 백엔드</div>
+        <div class="card-value" style="font-size:14px;">인증 & DB 연동 완료</div>
+      </div>
+      <div class="card-item">
+        <div class="card-title">06 프론트엔드 웹주소</div>
+        <div class="card-value"><a id="deployLink" target="_blank" style="font-size:13px; word-break:break-all;"></a></div>
+      </div>
+      <div class="card-item">
+        <div class="card-title">07 사용방법 안내</div>
+        <div class="card-value"><button class="btn btn-light" style="width:100%; padding:8px; font-size:13px;" onclick="openModal('guideModal')">안내 보기</button></div>
+      </div>
+      <div class="card-item">
+        <div class="card-title">08 배포 완료 확인</div>
+        <div class="card-value" style="font-size:14px;">웹 접속 & 링크 정상</div>
       </div>
     </section>
 
@@ -774,14 +795,19 @@
     }
 
     window.fillDemo = function(){
-      // 데모 계정으로 강제 접속 처리
-      openApp("demo@school.kr");
+      const emailInput = document.getElementById("loginEmail");
+      if (emailInput) emailInput.value = "demo@school.kr";
       
-      // 시연용이므로 Firestore 연동 에러 방지를 위해 히스토리 로드 우회
-      const ul = document.getElementById("historyList");
-      if(ul) {
-        ul.innerHTML = "<li>시연용 계정으로 접속 중입니다. (기록은 저장되지 않습니다.)</li>";
-      }
+      // 시각적으로 자동 입력된 것을 보여주기 위해 약간의 딜레이 후 접속
+      setTimeout(() => {
+        openApp("demo@school.kr");
+        
+        // 시연용이므로 Firestore 연동 에러 방지를 위해 히스토리 로드 우회
+        const ul = document.getElementById("historyList");
+        if(ul) {
+          ul.innerHTML = "<li>시연용 계정으로 접속 중입니다. (기록은 저장되지 않습니다.)</li>";
+        }
+      }, 500);
     };
 
     window.login = async function(){
