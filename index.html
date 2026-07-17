@@ -1184,7 +1184,8 @@
             <div>
               <label for="aiEngineSelect" style="font-size:12px; color:var(--text); margin-bottom:4px; display:block; font-weight:700;">✨ 생성 엔진 선택:</label>
               <select id="aiEngineSelect" style="width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--line); font-weight:700; color:var(--text); background:#fff;">
-                <option value="gemini-flash" selected>🚀 Google Gemini 2.0 Flash (스토리 분석 후 컷별 고품질 벡터 일러스트 생성)</option>
+                <option value="gemini-3-pro-image" selected>🌟 Google Gemini 3 Pro Image (초고품질 웹툰 일러스트 생성 - API 키 필수)</option>
+                <option value="gemini-flash">🚀 Google Gemini 2.0 Flash (스토리 분석 후 컷별 고품질 벡터 일러스트 생성)</option>
                 <option value="nanobanana">🍌 Google Nano Banana (Gemini 2.5 Flash Image) - 고품질 일러스트 생성 (API 키 필수)</option>
                 <option value="imagen3">🎨 Google Imagen 3 (`imagen-3.0-generate-002`) - 실사/웹툰 이미지 생성 (API 키 필수)</option>
                 <option value="pollinations">🌐 Pollinations AI Flux (API 키 없이 장면 영문 프롬프트 변환 고품질 렌더링)</option>
@@ -1914,6 +1915,43 @@ Rules:
             }
           } catch (err) {
             console.warn(`[${idx + 1}컷] Gemini Flash 생성 지연/에러, 다음 엔진으로 전환합니다:`, err);
+          }
+        }
+
+        if (aiEngine === "gemini-3-pro-image" && apiKey) {
+          try {
+            console.log(`[${idx + 1}컷] Google Gemini 3 Pro Image로 맞춤 일러스트 생성 중...`);
+            let response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.0-pro-image:generateContent?key=${apiKey}`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                contents: [{
+                  parts: [{ text: promptTags }]
+                }],
+                generationConfig: { responseModalities: ["IMAGE"] }
+              })
+            });
+            if (!response.ok) {
+              response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image:generateContent?key=${apiKey}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  contents: [{
+                    parts: [{ text: promptTags }]
+                  }],
+                  generationConfig: { responseModalities: ["IMAGE"] }
+                })
+              });
+            }
+            const data = await response.json();
+            const inlineData = data.candidates?.[0]?.content?.parts?.[0]?.inlineData;
+            if (inlineData && inlineData.data) {
+              const base64Img = inlineData.data;
+              const mimeType = inlineData.mimeType || "image/png";
+              return `data:${mimeType};base64,${base64Img}`;
+            }
+          } catch (err) {
+            console.warn(`[${idx + 1}컷] Gemini 3 Pro Image 생성 지연/에러, 다음 엔진으로 전환합니다:`, err);
           }
         }
 
