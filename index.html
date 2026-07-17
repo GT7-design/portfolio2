@@ -1595,38 +1595,116 @@
       return `${styleTag}, scene of ${characters}, ${actionPrompt}`;
     }
 
-    // [8] 장면에 맞게 모든 컷이 서로 다른 고품질 주제 반영 일러스트 SVG 렌더러
+    // [8] gentoon.ai 스타일: 모든 컷이 프롬프트/주제/캐릭터를 생생하게 반영하는 고품질 맞춤 웹툰 일러스트 SVG 렌더러
     function generateMeaningfulSceneArt(index, sceneText, genre, characters) {
       const palettes = [
-        ["#2e1065", "#7c3aed", "#f59e0b", "✨ 빛나는 옥구슬과 시간 여행"],
-        ["#451a03", "#b45309", "#fef3c7", "🏛️ 1,700년 전 백제 왕성의 전경"],
-        ["#064e3b", "#059669", "#a7f3d0", "🌿 비밀의 연못과 숲속 요정"],
-        ["#1e3a8a", "#3b82f6", "#93c5fd", "🌧️ 비바람 속 성벽 수호 작전"],
-        ["#14532d", "#22c55e", "#f0fdf4", "🌍 탄소중립 실천 친환경 학교"],
-        ["#581c87", "#9333ea", "#e9d5ff", "🎁 마음을 잇는 백제 전통 목걸이"],
-        ["#0f172a", "#334155", "#cbd5e1", "⏳ 과거와 현대가 만나는 현장"],
-        ["#701a75", "#c026d3", "#fdf4ff", "🌟 살아 숨 쉬는 우리 역사와 지혜"]
+        ["#1e1b4b", "#4c1d95", "#fbbf24", "✨ 빛나는 옥구슬과 시간 여행"],
+        ["#381804", "#9a3412", "#fde047", "🏛️ 1,700년 전 백제 왕성 풍납토성"],
+        ["#022c22", "#047857", "#6ee7b7", "🌿 비밀의 연못과 숲속 요정 루미"],
+        ["#172554", "#2563eb", "#93c5fd", "🌧️ 거센 비바람 속 성벽 수호 작전"],
+        ["#064e3b", "#16a34a", "#bbf7d0", "🌍 전교생이 함께하는 탄소중립 실천"],
+        ["#4a044e", "#a21caf", "#f5d0fe", "🎁 마음과 지혜를 잇는 전통 목걸이 선물"],
+        ["#0f172a", "#334155", "#e2e8f0", "⏳ 과거와 현대가 어우러지는 기적의 현장"],
+        ["#500724", "#be123c", "#fecdd3", "🌟 살아 숨 쉬는 풍납초 AI 웹툰 이야기"]
       ];
-      const [bgDark, bgMain, accent] = palettes[index % palettes.length];
+      const [bgDark, bgMain, accent, defaultTheme] = palettes[index % palettes.length];
       const safeText = shorten(sceneText.replace(/[<>&"]/g, ""), 55);
 
-      let visualShape = `<circle cx="300" cy="190" r="85" fill="${accent}" opacity="0.3"/>
-                         <circle cx="300" cy="190" r="45" fill="${accent}" opacity="0.85"/>
-                         <path d="M280 180 L320 200 L280 220 Z" fill="#ffffff" opacity="0.9"/>`;
-      if (/성벽|왕성|백제|건축|궁/.test(sceneText) || genre.includes("역사")) {
-        visualShape = `<path d="M120 280 L220 130 L380 130 L480 280 Z" fill="${bgMain}" opacity="0.85"/>
-                       <rect x="250" y="190" width="100" height="90" fill="${accent}" opacity="0.9"/>
-                       <polygon points="300,120 230,190 370,190" fill="${accent}"/>
-                       <circle cx="300" cy="160" r="18" fill="#ffffff" opacity="0.8"/>`;
-      } else if (/숲|나무|연못|자연|환경|그린/.test(sceneText) || genre.includes("환경")) {
-        visualShape = `<circle cx="300" cy="200" r="95" fill="${bgMain}" opacity="0.4"/>
-                       <path d="M300 110 C240 180 250 260 300 280 C350 260 360 180 300 110 Z" fill="${accent}" opacity="0.9"/>
-                       <circle cx="300" cy="210" r="25" fill="#ffffff" opacity="0.6"/>`;
-      } else if (/비바람|폭우|협동|보강|작전/.test(sceneText)) {
-        visualShape = `<path d="M150 270 Q300 200 450 270 L450 320 L150 320 Z" fill="${bgMain}" opacity="0.7"/>
-                       <line x1="200" y1="120" x2="170" y2="180" stroke="${accent}" stroke-width="4" stroke-linecap="round"/>
-                       <line x1="300" y1="100" x2="270" y2="160" stroke="${accent}" stroke-width="4" stroke-linecap="round"/>
-                       <line x1="400" y1="130" x2="370" y2="190" stroke="${accent}" stroke-width="4" stroke-linecap="round"/>`;
+      let scenery = "";
+      let characterShapes = "";
+      let atmosphere = "";
+
+      // [시나리오별 세밀한 고품질 시각 요소 구성 (gentoon.ai 연출 기법)]
+      if (/구슬|빛|옥구슬|보물/.test(sceneText)) {
+        atmosphere = `<circle cx="300" cy="180" r="130" fill="url(#radial_${index})" opacity="0.6"/>
+                      <circle cx="200" cy="100" r="4" fill="#fff" opacity="0.8"/><circle cx="420" cy="120" r="5" fill="#fff" opacity="0.9"/>`;
+        scenery = `<path d="M80 320 Q200 290 300 310 Q400 330 520 310 L520 350 L80 350 Z" fill="#334155" opacity="0.8"/>
+                   <rect x="260" y="220" width="80" height="90" fill="#475569" rx="6" stroke="${accent}" stroke-width="2"/>
+                   <text x="300" y="260" font-size="16" text-anchor="middle" fill="#f8fafc" font-weight="bold">안내판</text>`;
+        characterShapes = `<g filter="url(#glow_${index})">
+                             <circle cx="300" cy="160" r="42" fill="${accent}" opacity="0.3"/>
+                             <circle cx="300" cy="160" r="24" fill="${accent}"/>
+                             <circle cx="293" cy="153" r="7" fill="#ffffff" opacity="0.9"/>
+                           </g>
+                           <circle cx="220" cy="200" r="22" fill="#f8fafc"/>
+                           <path d="M190 290 C190 240 250 240 250 290 Z" fill="#3b82f6"/>
+                           <path d="M235 235 L280 165" stroke="#f8fafc" stroke-width="8" stroke-linecap="round"/>`;
+      } else if (/시간|이동|과거|황금빛|포털/.test(sceneText)) {
+        atmosphere = `<circle cx="300" cy="170" r="140" fill="none" stroke="${accent}" stroke-width="4" stroke-dasharray="12 8" opacity="0.8"/>
+                      <circle cx="300" cy="170" r="100" fill="url(#radial_${index})" opacity="0.7"/>`;
+        scenery = `<path d="M100 320 L200 200 L400 200 L500 320 Z" fill="#78350f" opacity="0.8"/>
+                   <polygon points="300,120 200,200 400,200" fill="#d97706"/>
+                   <rect x="270" y="200" width="60" height="80" fill="#451a03"/>`;
+        characterShapes = `<circle cx="300" cy="170" r="50" fill="${accent}" opacity="0.9" filter="url(#glow_${index})"/>
+                           <text x="300" y="177" font-size="28" text-anchor="middle" fill="#ffffff">🌀</text>
+                           <circle cx="300" cy="280" r="24" fill="#f8fafc"/>
+                           <path d="M265 350 C265 300 335 300 335 350 Z" fill="#2563eb"/>`;
+      } else if (/소년|서동|시장|만남|장인/.test(sceneText)) {
+        scenery = `<path d="M50 320 Q300 300 550 320 L550 360 L50 360 Z" fill="#92400e" opacity="0.7"/>
+                   <polygon points="120,220 60,300 180,300" fill="#b45309"/>
+                   <polygon points="480,220 420,300 540,300" fill="#b45309"/>
+                   <rect x="230" y="250" width="140" height="70" fill="#fef3c7" rx="4"/>
+                   <text x="300" y="280" font-size="16" text-anchor="middle" fill="#78350f" font-weight="bold">백제 왕성 잣시(시장)</text>`;
+        characterShapes = `<circle cx="240" cy="210" r="22" fill="#f8fafc"/>
+                           <path d="M210 300 C210 250 270 250 270 300 Z" fill="#2563eb"/>
+                           <circle cx="360" cy="210" r="22" fill="#fde047"/>
+                           <path d="M330 300 C330 250 390 250 390 300 Z" fill="#ea580c"/>
+                           <path d="M260 250 Q300 230 340 250" stroke="#f8fafc" stroke-width="6" stroke-linecap="round" fill="none"/>`;
+      } else if (/비바람|폭우|성벽|무너|보강|작전|뚝/.test(sceneText)) {
+        atmosphere = `<path d="M0 0 L600 450 M100 0 L600 380 M0 100 L500 450 M250 0 L600 280" stroke="#93c5fd" stroke-width="2" opacity="0.45"/>
+                      <circle cx="150" cy="80" r="40" fill="#475569" opacity="0.8"/><circle cx="350" cy="70" r="55" fill="#334155" opacity="0.9"/>`;
+        scenery = `<path d="M100 330 L230 140 L450 140 L560 330 Z" fill="#78350f" opacity="0.9"/>
+                   <line x1="230" y1="180" x2="450" y2="180" stroke="#92400e" stroke-width="4"/>
+                   <line x1="200" y1="240" x2="480" y2="240" stroke="#92400e" stroke-width="4"/>`;
+        characterShapes = `<circle cx="260" cy="230" r="20" fill="#f8fafc"/>
+                           <path d="M235 310 C235 265 285 265 285 310 Z" fill="#2563eb"/>
+                           <circle cx="340" cy="230" r="20" fill="#fde047"/>
+                           <path d="M315 310 C315 265 365 265 365 310 Z" fill="#ea580c"/>
+                           <line x1="220" y1="280" x2="380" y2="210" stroke="${accent}" stroke-width="10" stroke-linecap="round"/>`;
+      } else if (/선물|목걸이|감사|문양/.test(sceneText)) {
+        atmosphere = `<circle cx="300" cy="180" r="110" fill="url(#radial_${index})" opacity="0.75"/>`;
+        scenery = `<rect x="180" y="270" width="240" height="60" fill="#78350f" rx="8" opacity="0.8"/>`;
+        characterShapes = `<circle cx="230" cy="190" r="24" fill="#fde047"/>
+                           <path d="M195 280 C195 235 265 235 265 280 Z" fill="#ea580c"/>
+                           <circle cx="370" cy="190" r="24" fill="#f8fafc"/>
+                           <path d="M335 280 C335 235 405 235 405 280 Z" fill="#2563eb"/>
+                           <g filter="url(#glow_${index})">
+                             <circle cx="300" cy="210" r="26" fill="${accent}" opacity="0.3"/>
+                             <path d="M285 190 Q300 230 315 190" stroke="#fbbf24" stroke-width="4" fill="none"/>
+                             <circle cx="300" cy="215" r="12" fill="#10b981" stroke="#ffffff" stroke-width="2"/>
+                           </g>`;
+      } else if (/숲|요정|루미|연못|생명수/.test(sceneText) || genre.includes("판타지")) {
+        atmosphere = `<circle cx="120" cy="100" r="5" fill="#a7f3d0" opacity="0.8"/><circle cx="480" cy="140" r="6" fill="#a7f3d0" opacity="0.8"/>
+                      <circle cx="300" cy="200" r="130" fill="url(#radial_${index})" opacity="0.65"/>`;
+        scenery = `<path d="M60 320 C60 150 140 120 160 320 Z M440 320 C460 120 540 150 540 320 Z" fill="#064e3b" opacity="0.85"/>
+                   <ellipse cx="300" cy="280" rx="160" ry="45" fill="#06b6d4" opacity="0.7"/>
+                   <ellipse cx="300" cy="280" rx="130" ry="32" fill="#67e8f9" opacity="0.5"/>`;
+        characterShapes = `<circle cx="230" cy="210" r="22" fill="#f8fafc"/>
+                           <path d="M200 290 C200 245 260 245 260 290 Z" fill="#059669"/>
+                           <g filter="url(#glow_${index})">
+                             <circle cx="360" cy="180" r="35" fill="${accent}" opacity="0.3"/>
+                             <circle cx="360" cy="180" r="16" fill="#ffffff"/>
+                             <path d="M340 170 Q360 140 380 170 Q360 200 340 170" fill="${accent}" opacity="0.8"/>
+                           </g>`;
+      } else if (/플라스틱|쓰레기|조사|포스터|텀블러|캠페인|탄소중립|동참/.test(sceneText) || genre.includes("환경")) {
+        scenery = `<rect x="80" y="80" width="440" height="200" fill="#ffffff" opacity="0.12" rx="16" stroke="${accent}" stroke-width="2"/>
+                   <circle cx="300" cy="170" r="65" fill="#10b981" opacity="0.25"/>
+                   <path d="M280 130 C260 160 280 200 320 210 C340 190 330 140 280 130 Z" fill="#34d399" opacity="0.7"/>`;
+        characterShapes = `<circle cx="220" cy="190" r="22" fill="#f8fafc"/>
+                           <path d="M190 280 C190 235 250 235 250 280 Z" fill="#16a34a"/>
+                           <circle cx="380" cy="190" r="22" fill="#f8fafc"/>
+                           <path d="M350 280 C350 235 410 235 410 280 Z" fill="#0284c7"/>
+                           <rect x="285" y="170" width="30" height="55" fill="${accent}" rx="6" stroke="#ffffff" stroke-width="2"/>
+                           <text x="300" y="203" font-size="14" text-anchor="middle" fill="#064e3b" font-weight="900">ECO</text>`;
+      } else {
+        atmosphere = `<circle cx="300" cy="180" r="120" fill="url(#radial_${index})" opacity="0.7"/>`;
+        scenery = `<rect x="100" y="100" width="400" height="180" fill="#ffffff" opacity="0.1" rx="12"/>
+                   <path d="M60 320 Q300 290 540 320 L540 360 L60 360 Z" fill="${bgMain}" opacity="0.6"/>`;
+        characterShapes = `<circle cx="250" cy="200" r="24" fill="#f8fafc"/>
+                           <path d="M215 290 C215 240 285 240 285 290 Z" fill="${accent}"/>
+                           <circle cx="350" cy="200" r="24" fill="#f8fafc"/>
+                           <path d="M315 290 C315 240 385 240 385 290 Z" fill="#38bdf8"/>
+                           <circle cx="300" cy="160" r="18" fill="#fbbf24" opacity="0.9" filter="url(#glow_${index})"/>`;
       }
 
       const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="450" viewBox="0 0 600 450">
@@ -1635,25 +1713,27 @@
             <stop offset="0%" stop-color="${bgDark}"/>
             <stop offset="100%" stop-color="${bgMain}"/>
           </linearGradient>
+          <radialGradient id="radial_${index}" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="${accent}" stop-opacity="0.8"/>
+            <stop offset="100%" stop-color="${bgDark}" stop-opacity="0"/>
+          </radialGradient>
           <filter id="glow_${index}">
             <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
             <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
           </filter>
         </defs>
         <rect width="600" height="450" fill="url(#grad_${index})" />
-        <circle cx="100" cy="80" r="3" fill="#fff" opacity="0.5"/>
-        <circle cx="500" cy="120" r="4" fill="#fff" opacity="0.6"/>
-        <circle cx="480" cy="300" r="3" fill="#fff" opacity="0.4"/>
-        <circle cx="150" cy="350" r="5" fill="#fff" opacity="0.3"/>
-        
-        <g filter="url(#glow_${index})">
-          ${visualShape}
-        </g>
-        
-        <rect x="30" y="315" width="540" height="110" rx="16" fill="rgba(255, 255, 255, 0.96)" stroke="${accent}" stroke-width="2"/>
-        <text x="300" y="348" font-size="16" text-anchor="middle" fill="${bgDark}" font-weight="900" font-family="sans-serif">🎨 [제 ${index + 1}장 · ${genre}] 스토리 장면</text>
+        <circle cx="90" cy="70" r="3" fill="#fff" opacity="0.4"/>
+        <circle cx="510" cy="90" r="4" fill="#fff" opacity="0.5"/>
+        <circle cx="470" cy="270" r="3" fill="#fff" opacity="0.3"/>
+        <circle cx="130" cy="290" r="4" fill="#fff" opacity="0.35"/>
+        ${atmosphere}
+        ${scenery}
+        ${characterShapes}
+        <rect x="25" y="315" width="550" height="115" rx="16" fill="rgba(255, 255, 255, 0.96)" stroke="${accent}" stroke-width="2.5"/>
+        <text x="300" y="348" font-size="16" text-anchor="middle" fill="${bgDark}" font-weight="900" font-family="sans-serif">🎨 [제 ${index + 1}장 · ${genre}] ${defaultTheme}</text>
         <text x="300" y="378" font-size="14.5" text-anchor="middle" fill="#1e293b" font-weight="700" font-family="sans-serif">${safeText}</text>
-        <text x="300" y="405" font-size="12" text-anchor="middle" fill="#64748b" font-family="sans-serif">👥 등장인물: ${characters}</text>
+        <text x="300" y="406" font-size="12" text-anchor="middle" fill="#64748b" font-family="sans-serif">👥 등장인물: ${shorten(characters, 35)}</text>
       </svg>`;
       return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
     }
@@ -1777,8 +1857,8 @@ Rules:
 
         if (aiEngine === "nanobanana" && apiKey) {
           try {
-            console.log(`[${idx + 1}컷] Google Nano Banana (Gemini 3.1 Image Preview)로 맞춤 일러스트 생성 중...`);
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image-preview:generateContent?key=${apiKey}`, {
+            console.log(`[${idx + 1}컷] Google Nano Banana (Gemini 2.5 Flash Image)로 맞춤 일러스트 생성 중...`);
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${apiKey}`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
@@ -1817,18 +1897,15 @@ Rules:
               return `data:image/png;base64,${base64Img}`;
             }
           } catch (err) {
-            console.warn(`[${idx + 1}컷] Imagen 3 생성 지연/에러, Pollinations로 전환합니다:`, err);
+            console.warn(`[${idx + 1}컷] Imagen 3 생성 지연/에러, 맞춤 웹툰 일러스트 엔진으로 전환합니다:`, err);
           }
         }
 
         const aiUrlPrimary = `https://image.pollinations.ai/prompt/${encodeURIComponent(promptTags)}?width=600&height=450&nologo=true&seed=${seed}`;
-        const aiUrlTurbo = `https://image.pollinations.ai/prompt/${encodeURIComponent(promptTags)}?width=600&height=450&nologo=true&seed=${seed + 8888}&model=turbo`;
         const fallbackArt = generateMeaningfulSceneArt(idx, sceneText, genre, characters);
 
-        let imgUrl = await tryFetchImage(aiUrlPrimary, 8000);
-        if (!imgUrl) {
-          imgUrl = await tryFetchImage(aiUrlTurbo, 6000);
-        }
+        // 외부 렌더러가 4초 내 응답하지 않거나 에러 시 즉시 gentoon.ai 스타일 맞춤 웹툰 일러스트로 100% 즉시 렌더링
+        let imgUrl = await tryFetchImage(aiUrlPrimary, 4000);
         if (!imgUrl) {
           imgUrl = fallbackArt;
         }
@@ -1886,7 +1963,7 @@ Rules:
       }
     };
 
-    // [우수 예시 작품 갤러리 즉시 감상 (실시간 AI 일러스트 연동)]
+    // [우수 예시 작품 갤러리 즉시 감상 (100% 렌더링 보장 gentoon.ai 스타일 웹툰 일러스트 연동)]
     window.SAMPLE_WORKS = {
       historyBook: {
         title: "백제 왕성 풍납토성의 비밀",
@@ -1896,38 +1973,14 @@ Rules:
         createdAtStr: "예시 작품 (추천 갤러리)",
         createdBy: "서울풍납초 AI 창작소",
         scenes: [
-          {
-            text: "풍납토성 현장체험학습을 간 민준이는 안내판 옆에서 이상하게 빛나는 옥구슬을 발견했다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20historical%20adventure%2C%20young%20boy%20discovering%20a%20glowing%20mystical%20jade%20orb%20near%20an%20ancient%20earthen%20fortress%20wall%2C%20vivid%20colors%2C%20masterpiece?width=600&height=450&nologo=true&seed=101"
-          },
-          {
-            text: "구슬을 만지는 순간 신비한 황금빛과 함께 1,700년 전 백제 왕성 시절로 시간 이동을 하게 되었다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20historical%20adventure%2C%20golden%20magical%20time%20travel%20portal%20opening%20above%20ancient%20korean%20baekje%20palace%2C%20cinematic%20lighting%2C%20masterpiece?width=600&height=450&nologo=true&seed=102"
-          },
-          {
-            text: "그곳에서 또래의 백제 소년 서동을 만나 왕성의 북적이는 시장과 거대한 흙 성벽을 쌓는 장인들을 보았다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20historical%20adventure%2C%20two%20young%20boys%20meeting%20in%20ancient%20baekje%20kingdom%20bustling%20traditional%20marketplace%2C%20masterpiece?width=600&height=450&nologo=true&seed=103"
-          },
-          {
-            text: "갑자기 거센 비바람이 불어 성벽 일부가 무너질 위기에 처하자, 민준이와 서동은 사람들에게 위험을 알렸다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20historical%20adventure%2C%20heavy%20rainstorm%20and%20workers%20protecting%20an%20ancient%20earthen%20fortress%20wall%2C%20masterpiece?width=600&height=450&nologo=true&seed=104"
-          },
-          {
-            text: "힘을 합쳐 뚝을 보강한 덕분에 무사히 성벽을 지켜내고 사람들의 안전을 확보했다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20historical%20adventure%2C%20young%20boys%20working%20together%20bravely%20reinforcing%20the%20fortress%20wall%2C%20masterpiece?width=600&height=450&nologo=true&seed=105"
-          },
-          {
-            text: "서동이 감사의 의미로 백제 전통 문양이 새겨진 귀중한 작은 목걸이를 선물해 주었다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20historical%20adventure%2C%20ancient%20baekje%20boy%20giving%20a%20traditional%20jade%20necklace%20gift%2C%20masterpiece?width=600&height=450&nologo=true&seed=106"
-          },
-          {
-            text: "다시 구슬이 환하게 빛나며 현대의 풍납토성 잔디밭으로 신비롭게 돌아왔다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20historical%20adventure%2C%20mystical%20glowing%20portal%20bringing%20boy%20back%20to%20modern%20school%20field%2C%20masterpiece?width=600&height=450&nologo=true&seed=107"
-          },
-          {
-            text: "손에 쥐어진 목걸이를 바라보며 민준이는 우리의 소중한 역사를 깊이 마음에 새겼다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20historical%20adventure%2C%20happy%20young%20student%20holding%20ancient%20necklace%20looking%20at%20fortress%20park%2C%20masterpiece?width=600&height=450&nologo=true&seed=108"
-          }
+          { text: "풍납토성 현장체험학습을 간 민준이는 안내판 옆에서 이상하게 빛나는 옥구슬을 발견했다." },
+          { text: "구슬을 만지는 순간 신비한 황금빛과 함께 1,700년 전 백제 왕성 시절로 시간 이동을 하게 되었다." },
+          { text: "그곳에서 또래의 백제 소년 서동을 만나 왕성의 북적이는 시장과 거대한 흙 성벽을 쌓는 장인들을 보았다." },
+          { text: "갑자기 거센 비바람이 불어 성벽 일부가 무너질 위기에 처하자, 민준이와 서동은 사람들에게 위험을 알렸다." },
+          { text: "힘을 합쳐 뚝을 보강한 덕분에 무사히 성벽을 지켜내고 사람들의 안전을 확보했다." },
+          { text: "서동이 감사의 의미로 백제 전통 문양이 새겨진 귀중한 작은 목걸이를 선물해 주었다." },
+          { text: "다시 구슬이 환하게 빛나며 현대의 풍납토성 잔디밭으로 신비롭게 돌아왔다." },
+          { text: "손에 쥐어진 목걸이를 바라보며 민준이는 우리의 소중한 역사를 깊이 마음에 새겼다." }
         ]
       },
       fantasyBook: {
@@ -1938,22 +1991,10 @@ Rules:
         createdAtStr: "예시 작품 (추천 갤러리)",
         createdBy: "서울풍납초 AI 창작소",
         scenes: [
-          {
-            text: "학교 뒷산 마법의 숲을 거닐던 아리아는 요정 루미와 신비한 비밀의 연못을 만났다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20educational%20fantasy%2C%20young%20boy%20and%20glowing%20fairy%20meeting%20at%20mystical%20forest%20pond%2C%20masterpiece?width=600&height=450&nologo=true&seed=201"
-          },
-          {
-            text: "연못 속에는 멸종 위기 식물들과 맑은 생명수가 찬란하게 빛나고 있었다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20educational%20fantasy%2C%20crystal%20clear%20magical%20pond%20with%20glowing%20rare%20plants%20underwater%2C%20masterpiece?width=600&height=450&nologo=true&seed=202"
-          },
-          {
-            text: "아리아와 루미는 숲을 더럽히는 쓰레기 마물을 정화의 마법으로 깨끗이 물리쳤다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20educational%20fantasy%2C%20boy%20and%20fairy%20casting%20purification%20magic%20to%20clean%20dark%20trash%20monster%2C%20masterpiece?width=600&height=450&nologo=true&seed=203"
-          },
-          {
-            text: "아리아는 자연을 사랑하고 지키는 것이 진정한 마법임을 가슴속에 간직했다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20educational%20fantasy%2C%20happy%20boy%20smiling%20in%20bright%20sunlit%20clean%20green%20forest%2C%20masterpiece?width=600&height=450&nologo=true&seed=204"
-          }
+          { text: "학교 뒷산 마법의 숲을 거닐던 아리아는 요정 루미와 신비한 비밀의 연못을 만났다." },
+          { text: "연못 속에는 멸종 위기 식물들과 맑은 생명수가 찬란하게 빛나고 있었다." },
+          { text: "아리아와 루미는 숲을 더럽히는 쓰레기 마물을 정화의 마법으로 깨끗이 물리쳤다." },
+          { text: "아리아는 자연을 사랑하고 지키는 것이 진정한 마법임을 가슴속에 간직했다." }
         ]
       },
       ecoBook: {
@@ -1964,25 +2005,21 @@ Rules:
         createdAtStr: "예시 작품 (추천 갤러리)",
         createdBy: "서울풍납초 AI 창작소",
         scenes: [
-          {
-            text: "교내 환경동아리 그린팀 친구들은 일회용 플라스틱 쓰레기 문제의 심각성을 조사했다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20school%20environmental%20club%20students%20investigating%20plastic%20waste%2C%20masterpiece?width=600&height=450&nologo=true&seed=301"
-          },
-          {
-            text: "친구들과 함께 텀블러 사용하기 및 분리배출 캠페인 포스터를 멋지게 제작했다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20students%20drawing%20colorful%20eco%20friendly%20campaign%20posters%20and%20reusable%20tumblers%2C%20masterpiece?width=600&height=450&nologo=true&seed=302"
-          },
-          {
-            text: "전교생과 선생님들이 다 함께 실천 약속에 동참하며 플라스틱 제로에 도전했다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20happy%20school%20students%20and%20teachers%20holding%20tumblers%20together%20in%20clean%20classroom%2C%20masterpiece?width=600&height=450&nologo=true&seed=303"
-          },
-          {
-            text: "우리 학교의 깨끗한 변화가 지구를 구하는 큰 실천이 됨을 모두가 자랑스러워했다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20beautiful%20clean%20green%20school%20building%20under%20bright%20blue%20sky%20and%20earth%2C%20masterpiece?width=600&height=450&nologo=true&seed=304"
-          }
+          { text: "교내 환경동아리 그린팀 친구들은 일회용 플라스틱 쓰레기 문제의 심각성을 조사했다." },
+          { text: "친구들과 함께 텀블러 사용하기 및 분리배출 캠페인 포스터를 멋지게 제작했다." },
+          { text: "전교생과 선생님들이 다 함께 실천 약속에 동참하며 플라스틱 제로에 도전했다." },
+          { text: "우리 학교의 깨끗한 변화가 지구를 구하는 큰 실천이 됨을 모두가 자랑스러워했다." }
         ]
       }
     };
+
+    // 예시 갤러리 로드 시 외부 서버 대기/오류 없이 즉시 100% 고품질 맞춤 일러스트가 나타나도록 동기 생성 적용
+    Object.keys(window.SAMPLE_WORKS).forEach(key => {
+      const work = window.SAMPLE_WORKS[key];
+      work.scenes.forEach((scene, idx) => {
+        scene.imgUrl = generateMeaningfulSceneArt(idx, scene.text, work.genre, work.characters);
+      });
+    });
 
     window.loadSampleWork = function(key) {
       const data = window.SAMPLE_WORKS[key];
