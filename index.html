@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>서울풍납초등학교 AI 웹툰 창작소</title>
+  <style>
+    :root{
+      --primary:#7c3aed;
+      --bg:#f7f5ff;
+      --card:#ffffff;
+      --line:#ddd6fe;
+      --text:#1f2937;
+      --muted:#64748b;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Pretendard,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    .hidden{display:none !important}
+    .auth{min-height:100vh;display:grid;place-items:center;padding:24px}
+    .auth-box,.card{background:#fff;border:1px solid var(--line);border-radius:18px}
+    .auth-box{width:min(520px,100%);padding:32px;text-align:center}
+    .logo{width:78px;height:78px;object-fit:contain;margin-bottom:10px}
+    .btn{border:0;border-radius:12px;padding:12px 16px;cursor:pointer;font-weight:700}
+    .btn.primary{background:var(--primary);color:#fff}
+    .btn.secondary{background:#f3e8ff;color:var(--primary)}
+    .app{max-width:1280px;margin:0 auto;padding:20px}
+    .header{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:16px}
+    .brand{display:flex;gap:14px;align-items:center}
+    .brand h1{margin:0;font-size:28px}
+    .brand p{margin:4px 0 0;color:#475569}
+    .badge{display:inline-block;background:#f3e8ff;color:var(--primary);padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700}
+    .userbox{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .hero{padding:20px}
+    .hero p{color:#475569;line-height:1.7}
+    .mini-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+    .mini-card{padding:14px;border:1px solid var(--line);border-radius:14px;background:#faf7ff}
+    .mini-card strong{display:block;margin-bottom:8px}
+    .mini-card a{color:var(--primary);word-break:break-all}
+    .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:16px}
+    details.card{padding:14px}
+    details summary{cursor:pointer;font-weight:700}
+    .editor{display:grid;grid-template-columns:380px 1fr;gap:16px;margin-top:16px}
+    .pane{padding:18px}
+    .field{margin-bottom:12px}
+    .field label{display:block;font-weight:700;margin-bottom:6px}
+    input,textarea,select{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;font:inherit}
+    textarea{min-height:220px;resize:vertical;line-height:1.7}
+    .panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+    .panel{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+    .panel img{display:block;width:100%;height:190px;object-fit:cover;background:#ede9fe}
+    .panel-body{padding:14px}
+    .panel-body h3{margin:0 0 8px;font-size:16px}
+    .panel-body p{margin:0 0 8px;line-height:1.6;color:#334155}
+    .history ul{list-style:none;margin:0;padding:0}
+    .history li{padding:12px;border-bottom:1px solid var(--line);line-height:1.5}
+    footer{margin:20px 0 32px;text-align:center;color:#475569;font-size:14px}
+    @media (max-width: 950px){
+      .editor{grid-template-columns:1fr}
+      .header{flex-direction:column;align-items:flex-start}
+    }
+  </style>
+</head>
+<body>
+  <div id="authScreen" class="auth">
+    <div class="auth-box">
+      <img src="logo.png" alt="서울풍납초등학교 로고" class="logo" onerror="this.style.display='none'">
+      <h1>서울풍납초등학교 AI 웹툰 창작소</h1>
+      <p>소속학교: 서울풍납초등학교 / 작성자: 교사 김규태</p>
+      <p>
+        학생의 긴 글을 장면별로 나누고, 컷 수에 맞추어 스토리·장면 설명·이미지 프롬프트를 생성하는 수업용 서비스입니다.
+      </p>
+      <button id="loginBtn" class="btn primary">Google 계정으로 인증하고 입장</button>
+      <p style="margin-top:12px;color:#64748b;">실제 제출용은 Firebase 연결 후 배포 URL에서 확인하세요.</p>
+    </div>
+  </div>
+
+  <div id="appShell" class="app hidden">
+    <div class="header">
+      <div class="brand">
+        <img src="logo.png" alt="서울풍납초등학교 로고" class="logo" onerror="this.style.display='none'">
+        <div>
+          <span class="badge">소속학교: 서울풍납초등학교</span>
+          <h1>AI 웹툰 창작소</h1>
+          <p>작성자: 서울풍납초등학교 교사 김규태</p>
+        </div>
+      </div>
+      <div class="userbox">
+        <span id="backendBadge" class="badge">백엔드 확인 중</span>
+        <span id="userInfo" class="badge">로그인 정보 없음</span>
+        <button id="logoutBtn" class="btn secondary">로그아웃</button>
+      </div>
+    </div>
+
+    <section class="card hero">
+      <h2>서비스 소개</h2>
+      <p>
+        학생이 짧은 글이 아니라 비교적 긴 줄거리, 배경 설정, 등장인물 설명까지 적을 수 있도록 설계했습니다.
+        입력된 스토리를 컷 단위로 나누고, 각 컷의 이야기 요약과 이미지 생성용 프롬프트를 자동 정리해줍니다.
+      </p>
+      <div class="mini-grid">
+        <div class="mini-card">
+          <strong>GitHub 레포지토리 주소</strong>
+          <a id="repoLink" href="#" target="_blank" rel="noopener"></a>
+        </div>
+        <div class="mini-card">
+          <strong>프론트엔드 웹주소</strong>
+          <a id="deployLink" href="#" target="_blank" rel="noopener"></a>
+        </div>
+        <div class="mini-card">
+          <strong>Firebase 백엔드</strong>
+          <span id="backendText"></span>
+        </div>
+        <div class="mini-card">
+          <strong>문의처</strong>
+          <span>서울풍납초등학교 교사 김규태 / 교내 문의</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="info-grid">
+      <details class="card" open>
+        <summary>개인정보처리방침</summary>
+        <p>
+          수집 항목: 로그인 계정 이름, 이메일, 작품 제목, 등장인물, 스토리 원문, 생성 결과.<br>
+          이용 목적: 수업 시연, 창작 활동 지원, 생성 기록 확인.<br>
+          보관 기간: 시연용 예시 기준 90일.<br>
+          문의처: 서울풍납초등학교 교사 김규태.
+        </p>
+      </details>
+      <details class="card">
+        <summary>사용약관</summary>
+        <p>
+          본 서비스는 교육 목적 시연용입니다.<br>
+          타인의 저작물을 무단 도용하거나 부적절한 내용을 입력해서는 안 됩니다.<br>
+          생성 결과는 참고용이며, 교사의 검토 후 활용해야 합니다.
+        </p>
+      </details>
+      <details class="card">
+        <summary>사용방법 안내</summary>
+        <p>
+          1) 로그인 후 작품 제목, 등장인물, 컷 수를 선택합니다.<br>
+          2) 자세한 이야기 원문을 작성합니다.<br>
+          3) 생성 버튼을 누르면 컷별 줄거리와 이미지 프롬프트가 표시됩니다.
+        </p>
+      </details>
+      <details class="card">
+        <summary>배포 완료 확인</summary>
+        <p>
+          □ 로그인 가능<br>
+          □ 컷 수 4/8/12 선택 가능<br>
+          □ 장면 카드 생성 확인<br>
+          □ GitHub URL / 배포 URL 연결 확인<br>
+          □ 생성 기록 저장 확인
+        </p>
+      </details>
+    </section>
+
+    <section class="editor">
+      <div class="card pane">
+        <h2 style="margin-top:0;">웹툰 생성 입력</h2>
+        <div class="field">
+          <label for="titleInput">작품 제목</label>
+          <input id="titleInput" type="text" placeholder="예: 풍납토성 시간여행 대모험">
+        </div>
+        <div class="field">
+          <label for="charactersInput">주요 등장인물</label>
+          <input id="charactersInput" type="text" placeholder="예: 민준, 백제 소년, 담임 선생님">
+        </div>
+        <div class="field">
+          <label for="genreInput">장르</label>
+          <select id="genreInput">
+            <option value="교육 판타지">교육 판타지</option>
+            <option value="역사 모험">역사 모험</option>
+            <option value="학교 일상">학교 일상</option>
+            <option value="환경 캠페인">환경 캠페인</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="cutsInput">컷 수</label>
+          <select id="cutsInput">
+            <option value="4">4컷</option>
+            <option value="8">8컷</option>
+            <option value="12">12컷</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="storyInput">상세 스토리</label>
+          <textarea id="storyInput" placeholder="학생이 보다 길고 구체적인 이야기를 작성할 수 있도록 충분히 입력합니다.
+예: 풍납토성 현장체험학습을 갔던 민준이는 안내판 옆에서 반짝이는 구슬을 발견했다. 그 구슬을 만지는 순간 백제 시대로 이동했고, 그곳에서 또래 친구를 만나 왕성의 생활을 배우게 되었다..."></textarea>
+        </div>
+        <button class="btn primary" onclick="generateWebtoon()">컷별 스토리 생성 및 저장</button>
+
+        <div class="history" style="margin-top:18px;">
+          <h3>최근 생성 기록</h3>
+          <ul id="historyList"></ul>
+        </div>
+      </div>
+
+      <div class="card pane">
+        <h2 style="margin-top:0;">생성 결과</h2>
+        <div id="panelArea" class="panels"></div>
+      </div>
+    </section>
+
+    <footer>
+      소속학교: 서울풍납초등학교 | 이름: 김규태 | GitHub 공개 저장소와 배포 URL을 포함한 포트폴리오 2
+    </footer>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script>
+    const APP_INFO = {
+      repoUrl: "https://github.com/깃허브아이디/pungnap-portfolio-2",
+      deployUrl: "https://pungnap-portfolio-2.vercel.app",
+      allowedDomains: ["sen.go.kr", "school.kr"]
+    };
+
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.firebasestorage.app",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const FIREBASE_READY =
+      window.firebase &&
+      firebaseConfig.apiKey &&
+      !String(firebaseConfig.apiKey).includes("YOUR_");
+
+    let auth = null;
+    let db = null;
+    let currentUser = null;
+
+    if (FIREBASE_READY) {
+      firebase.initializeApp(firebaseConfig);
+      auth = firebase.auth();
+      db = firebase.firestore();
+    }
+
+    function qs(id){ return document.getElementById(id); }
+    function esc(v){ return String(v || "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[m])); }
+    function two(n){ return String(n).padStart(2, "0"); }
+    function fmt(ts){
+      const d = new Date(ts);
+      return d.getFullYear()+"-"+two(d.getMonth()+1)+"-"+two(d.getDate())+" "+two(d.getHours())+":"+two(d.getMinutes());
+    }
+    function allowedEmail(email){
+      if (!email) return false;
+      return APP_INFO.allowedDomains.some(d => email.toLowerCase().endsWith("@" + d.replace("@","").toLowerCase()));
+    }
+    function localGet(key){
+      try { return JSON.parse(localStorage.getItem(key) || "[]"); } catch(e){ return []; }
+    }
+    function localSet(key, value){
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    function setMeta(){
+      qs("repoLink").href = APP_INFO.repoUrl;
+      qs("repoLink").textContent = APP_INFO.repoUrl;
+      qs("deployLink").href = APP_INFO.deployUrl;
+      qs("deployLink").textContent = APP_INFO.deployUrl;
+      qs("backendBadge").textContent = FIREBASE_READY ? "Firebase 연동 모드" : "시연 모드";
+      qs("backendText").textContent = FIREBASE_READY
+        ? "Authentication + Firestore 사용"
+        : "Firebase 미설정 시 LocalStorage 시연 모드로 동작";
+    }
+
+    function showApp(user){
+      currentUser = user;
+      qs("authScreen").classList.add("hidden");
+      qs("appShell").classList.remove("hidden");
+      qs("userInfo").textContent = (user.displayName || "사용자") + " / " + (user.email || "demo@local");
+      loadHistory();
+    }
+
+    function showAuth(){
+      qs("appShell").classList.add("hidden");
+      qs("authScreen").classList.remove("hidden");
+    }
+
+    async function login(){
+      if (!FIREBASE_READY) {
+        showApp({ displayName: "김규태(시연)", email: "demo@school.local" });
+        return;
+      }
+      try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: "select_account" });
+        const result = await auth.signInWithPopup(provider);
+        if (!allowedEmail(result.user.email)) {
+          await auth.signOut();
+          alert("허용된 학교/교육청 계정으로만 접속할 수 있습니다.");
+          return;
+        }
+        await db.collection("portfolio2_accessLogs").add({
+          email: result.user.email,
+          name: result.user.displayName || "",
+          createdAtMs: Date.now()
+        });
+        showApp(result.user);
+      } catch (e) {
+        alert("로그인 중 오류가 발생했습니다: " + e.message);
+      }
+    }
+
+    async function logout(){
+      if (FIREBASE_READY && auth) await auth.signOut();
+      showAuth();
+    }
+
+    function splitScenes(text, cuts){
+      const cleaned = text.replace(/\n+/g, " ").trim();
+      const sentences = cleaned.split(/(?<=[.!?]|다\.)\s+/).filter(Boolean);
+      const base = sentences.length ? sentences : [cleaned];
+      const scenes = Array.from({ length: cuts }, () => []);
+      base.forEach((s, i) => scenes[i % cuts].push(s));
+      return scenes.map((group, i) => {
+        const merged = group.join(" ").trim();
+        return merged || ("장면 " + (i + 1) + "의 핵심 사건");
+      });
+    }
+
+    function sceneTitle(scene, idx){
+      const short = scene.length > 24 ? scene.slice(0, 24) + "..." : scene;
+      return "장면 " + idx + " - " + short;
+    }
+
+    function makePrompt(genre, characters, scene){
+      return `${genre} 분위기, ${characters}, 학교 수업용 웹툰 장면, 선명한 색감, 아동 친화적 표현, ${scene}`;
+    }
+
+    function makeSvg(scene, idx){
+      const short = scene.length > 28 ? scene.slice(0, 28) + "..." : scene;
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300">
+          <rect width="480" height="300" fill="#ede9fe"/>
+          <rect x="20" y="20" width="440" height="260" rx="24" fill="#ffffff" stroke="#7c3aed" stroke-width="4"/>
+          <text x="40" y="68" font-size="28" font-family="Arial" fill="#7c3aed">SCENE ${idx}</text>
+          <text x="40" y="130" font-size="20" font-family="Arial" fill="#1f2937">${short}</text>
+          <text x="40" y="200" font-size="16" font-family="Arial" fill="#64748b">AI 이미지 자리 표시 예시</text>
+        </svg>
+      `;
+      return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+    }
+
+    async function generateWebtoon(){
+      const title = qs("titleInput").value.trim();
+      const characters = qs("charactersInput").value.trim();
+      const genre = qs("genreInput").value;
+      const cuts = Number(qs("cutsInput").value);
+      const story = qs("storyInput").value.trim();
+
+      if (!title || !characters || !story) {
+        alert("제목, 등장인물, 상세 스토리를 모두 입력해주세요.");
+        return;
+      }
+
+      const scenes = splitScenes(story, cuts);
+      qs("panelArea").innerHTML = scenes.map((scene, idx) => `
+        <div class="panel">
+          <img src="${makeSvg(scene, idx + 1)}" alt="장면 ${idx + 1}">
+          <div class="panel-body">
+            <h3>${esc(sceneTitle(scene, idx + 1))}</h3>
+            <p><strong>이야기 요약:</strong> ${esc(scene)}</p>
+            <p><strong>이미지 프롬프트:</strong> ${esc(makePrompt(genre, characters, scene))}</p>
+          </div>
+        </div>
+      `).join("");
+
+      const record = {
+        title,
+        characters,
+        genre,
+        cuts,
+        story,
+        createdBy: currentUser ? (currentUser.displayName || currentUser.email) : "시연 사용자",
+        createdAtMs: Date.now()
+      };
+
+      if (FIREBASE_READY) {
+        await db.collection("portfolio2_webtoons").add(record);
+      } else {
+        const arr = localGet("p2_webtoons");
+        arr.unshift(record);
+        localSet("p2_webtoons", arr.slice(0, 20));
+      }
+
+      loadHistory();
+    }
+
+    async function loadHistory(){
+      let rows = [];
+      if (FIREBASE_READY) {
+        const snap = await db.collection("portfolio2_webtoons").orderBy("createdAtMs", "desc").limit(8).get();
+        rows = snap.docs.map(doc => doc.data());
+      } else {
+        rows = localGet("p2_webtoons");
+      }
+      qs("historyList").innerHTML = rows.length
+        ? rows.map(r => `<li><strong>${esc(r.title)}</strong> / ${esc(String(r.cuts))}컷 / ${esc(r.genre)}<br><span style="color:#64748b">${fmt(r.createdAtMs)}</span></li>`).join("")
+        : "<li>아직 생성 기록이 없습니다.</li>";
+    }
+
+    qs("loginBtn").addEventListener("click", login);
+    qs("logoutBtn").addEventListener("click", logout);
+    setMeta();
+
+    if (FIREBASE_READY) {
+      auth.onAuthStateChanged(user => {
+        if (user && allowedEmail(user.email)) showApp(user);
+        else showAuth();
+      });
+    }
+  </script>
+</body>
+</html>
