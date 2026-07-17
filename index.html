@@ -507,7 +507,26 @@
     </section>
   </div>
 
-  <script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA4jbnTnwXcJVS2fBCv5B8ftxA9u95QFTg",
+      authDomain: "portfolio-aca66.firebaseapp.com",
+      projectId: "portfolio-aca66",
+      storageBucket: "portfolio-aca66.firebasestorage.app",
+      messagingSenderId: "1064758521913",
+      appId: "1:1064758521913:web:e9f221d7373af3f6861de8",
+      measurementId: "G-46NTXEDBZQ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
     const CONFIG = {
       SCHOOL: "서울풍납초등학교",
       AUTHOR: "교사 김규태",
@@ -519,8 +538,6 @@
     };
 
     const REPO_URL = `https://github.com/${CONFIG.GITHUB_USER}/${CONFIG.REPO_NAME}`;
-    const STORAGE_KEY = "pungnap_portfolio2_history";
-    const LOGIN_KEY = "pungnap_portfolio2_login";
 
     function setLogos(){
       document.getElementById("loginLogo").src = CONFIG.LOGO_URL;
@@ -537,44 +554,72 @@
       deployLink.textContent = CONFIG.DEPLOY_URL;
     }
 
-    function fillDemo(){
-      document.getElementById("loginEmail").value = "student@school.kr";
-    }
+    window.fillDemo = function(){
+      alert("Firebase 인증에서는 'Google 계정으로 인증' 버튼을 눌러 실제 구글 계정으로 로그인해야 합니다.");
+    };
 
-    function login(){
-      const email = document.getElementById("loginEmail").value.trim();
-      if(!email || !email.includes("@")){
-        alert("Google 계정 이메일을 입력해주세요.");
-        return;
-      }
-      const domain = email.split("@")[1].toLowerCase();
-      if(!CONFIG.ALLOWED_DOMAINS.includes(domain)){
-        alert("시연용 기준 허용 도메인은 @sen.go.kr, @school.kr, @edu.sen.go.kr 입니다.");
-        return;
-      }
-      sessionStorage.setItem(LOGIN_KEY, email);
-      openApp(email);
-    }
+    window.login = async function(){
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const email = result.user.email;
+        const domain = email.split("@")[1].toLowerCase();
 
-    function logout(){
-      sessionStorage.removeItem(LOGIN_KEY);
-      document.getElementById("appScreen").classList.add("hidden");
-      document.getElementById("loginScreen").classList.remove("hidden");
-    }
+        if(!CONFIG.ALLOWED_DOMAINS.includes(domain)){
+          alert("시연용 기준 허용 도메인은 @sen.go.kr, @school.kr, @edu.sen.go.kr, @gmail.com 입니다.");
+          await signOut(auth);
+          return;
+        }
+      } catch (error) {
+        console.error("로그인 에러:", error);
+        alert("로그인 중 오류가 발생했습니다.");
+      }
+    };
+
+    window.logout = async function(){
+      try {
+        await signOut(auth);
+      } catch (error) {
+        console.error("로그아웃 에러:", error);
+      }
+    };
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        openApp(user.email);
+        subscribeHistory();
+      } else {
+        document.getElementById("appScreen").classList.add("hidden");
+        document.getElementById("loginScreen").classList.remove("hidden");
+        if (unsubscribe) {
+          unsubscribe();
+          unsubscribe = null;
+        }
+      }
+    });
 
     function openApp(email){
       document.getElementById("loginScreen").classList.add("hidden");
       document.getElementById("appScreen").classList.remove("hidden");
       document.getElementById("userPill").textContent = `인증 계정: ${email}`;
-      renderHistory();
     }
 
-    function getHistory(){
-      return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-    }
+    let unsubscribe = null;
+    let historyList = [];
 
-    function saveHistory(items){
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    function subscribeHistory() {
+      const q = query(collection(db, "webtoons"), orderBy("createdAt", "desc"), limit(10));
+      unsubscribe = onSnapshot(q, (snapshot) => {
+        historyList = [];
+        snapshot.forEach((doc) => {
+          historyList.push(doc.data());
+        });
+        renderHistory();
+      }, (error) => {
+        console.error("데이터 가져오기 에러:", error);
+        if (error.code === 'permission-denied') {
+          console.warn("Firestore 보안 규칙 때문에 데이터를 읽을 수 없습니다. Firebase 콘솔에서 보안 규칙을 설정해주세요.");
+        }
+      });
     }
 
     function splitIntoScenes(text, cuts){
@@ -599,7 +644,7 @@
       return `${genre}, ${characters}, 학생용 웹툰 장면, 따뜻한 색감, 교육용 일러스트, ${scene}`;
     }
 
-    function generateWebtoon(){
+    window.generateWebtoon = async function(){
       const title = document.getElementById("titleInput").value.trim();
       const characters = document.getElementById("charactersInput").value.trim();
       const genre = document.getElementById("genreInput").value;
@@ -627,66 +672,44 @@
         </div>
       `).join("");
 
-      const list = getHistory();
-      list.unshift({
-        title,
-        cuts,
-        genre,
-        createdAt: new Date().toLocaleString("ko-KR")
-      });
-      saveHistory(list.slice(0, 8));
-      renderHistory();
-    }
+      try {
+        const now = new Date();
+        const formatter = new Intl.DateTimeFormat("ko-KR", {
+          year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit', second: '2-digit'
+        });
+        
+        await addDoc(collection(db, "webtoons"), {
+          title,
+          cuts,
+          genre,
+          createdAt: serverTimestamp(),
+          createdAtStr: formatter.format(now),
+          createdBy: auth.currentUser.email
+        });
+
+      } catch (error) {
+        console.error("데이터 저장 에러:", error);
+        alert("기록 저장 중 오류가 발생했습니다. (Firestore 설정 및 보안 규칙을 확인하세요)");
+      }
+    };
 
     function renderHistory(){
-      const list = getHistory();
       const ul = document.getElementById("historyList");
-      if(!list.length){
-        ul.innerHTML = "<li>아직 생성 기록이 없습니다.</li>";
+      if(!historyList.length){
+        ul.innerHTML = "<li>아직 생성 기록이 없습니다. (혹은 Firestore 규칙 설정 필요)</li>";
         return;
       }
-      ul.innerHTML = list.map(item => `
+      ul.innerHTML = historyList.map(item => `
         <li>
           <strong>${item.title}</strong> · ${item.cuts}컷 · ${item.genre}<br>
-          <span style="color:#64748b;">${item.createdAt}</span>
+          <span style="color:#64748b;">${item.createdAtStr || "방금 전"}</span>
         </li>
       `).join("");
     }
 
     setLogos();
     setLinks();
-
-    const savedLogin = sessionStorage.getItem(LOGIN_KEY);
-    if(savedLogin){
-      openApp(savedLogin);
-    }
   </script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
- <script type="module">
- // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyA4jbnTnwXcJVS2fBCv5B8ftxA9u95QFTg",
-    authDomain: "portfolio-aca66.firebaseapp.com",
-    projectId: "portfolio-aca66",
-    storageBucket: "portfolio-aca66.firebasestorage.app",
-    messagingSenderId: "1064758521913",
-    appId: "1:1064758521913:web:e9f221d7373af3f6861de8",
-    measurementId: "G-46NTXEDBZQ"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
 </body>
 </html>
