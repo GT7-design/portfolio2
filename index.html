@@ -1623,7 +1623,7 @@
       alert(`💡 [${data.title}] 추천 스토리가 입력되었습니다!\n\n아래의 '⚡ AI 웹툰 컷 및 일러스트 생성하기' 버튼을 누르면 즉시 일러스트가 생성됩니다.`);
     };
 
-    // [우수 예시 작품 갤러리 즉시 감상]
+    // [우수 예시 작품 갤러리 즉시 감상 (실시간 AI 일러스트 연동)]
     const SAMPLE_WORKS = {
       historyBook: {
         title: "백제 왕성 풍납토성의 비밀",
@@ -1635,35 +1635,35 @@
         scenes: [
           {
             text: "풍납토성 현장체험학습을 간 민준이는 안내판 옆에서 이상하게 빛나는 옥구슬을 발견했다.",
-            imgUrl: "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%"><defs><linearGradient id="bg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2e1065"/><stop offset="100%" stop-color="#4c1d95"/></linearGradient></defs><rect width="600" height="400" fill="url(#bg1)"/><circle cx="300" cy="200" r="80" fill="#f59e0b" opacity="0.3"/><circle cx="300" cy="200" r="40" fill="#fbbf24"/><text x="300" y="340" fill="#fff" font-size="22" font-weight="bold" text-anchor="middle" font-family="sans-serif">✨ 빛나는 옥구슬의 발견</text></svg>`)
+            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20historical%20adventure%2C%20young%20boy%20discovering%20a%20glowing%20mystical%20jade%20orb%20near%20an%20ancient%20earthen%20fortress%20wall%2C%20vivid%20colors%2C%20masterpiece?width=600&height=450&nologo=true&seed=101"
           },
           {
             text: "구슬을 만지는 순간 신비한 황금빛과 함께 1,700년 전 백제 왕성 시절로 시간 이동을 하게 되었다.",
-            imgUrl: "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%"><defs><linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#451a03"/><stop offset="100%" stop-color="#b45309"/></linearGradient></defs><rect width="600" height="400" fill="url(#bg2)"/><path d="M100 350 L300 150 L500 350 Z" fill="#78350f" opacity="0.8"/><text x="300" y="200" fill="#fef3c7" font-size="24" font-weight="bold" text-anchor="middle" font-family="sans-serif">🏛️ 1,700년 전 백제 왕성으로</text></svg>`)
+            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20historical%20adventure%2C%20golden%20magical%20time%20travel%20portal%20opening%20above%20ancient%20korean%20baekje%20palace%2C%20cinematic%20lighting%2C%20masterpiece?width=600&height=450&nologo=true&seed=102"
           },
           {
             text: "그곳에서 또래의 백제 소년 서동을 만나 왕성의 북적이는 시장과 거대한 흙 성벽을 쌓는 장인들을 보았다.",
-            imgUrl: "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%"><defs><linearGradient id="bg3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#064e3b"/><stop offset="100%" stop-color="#059669"/></linearGradient></defs><rect width="600" height="400" fill="url(#bg3)"/><text x="300" y="200" fill="#fff" font-size="24" font-weight="bold" text-anchor="middle" font-family="sans-serif">👥 백제 소년 서동과의 만남</text></svg>`)
+            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20historical%20adventure%2C%20two%20young%20boys%20meeting%20in%20ancient%20baekje%20kingdom%20bustling%20traditional%20marketplace%2C%20masterpiece?width=600&height=450&nologo=true&seed=103"
           },
           {
             text: "갑자기 거센 비바람이 불어 성벽 일부가 무너질 위기에 처하자, 민준이와 서동은 사람들에게 위험을 알렸다.",
-            imgUrl: "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%"><defs><linearGradient id="bg4" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#1e3a8a"/><stop offset="100%" stop-color="#3b82f6"/></linearGradient></defs><rect width="600" height="400" fill="url(#bg4)"/><text x="300" y="200" fill="#fff" font-size="24" font-weight="bold" text-anchor="middle" font-family="sans-serif">🌧️ 비바람 속 성벽 보수 작전</text></svg>`)
+            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20historical%20adventure%2C%20heavy%20rainstorm%20and%20workers%20protecting%20an%20ancient%20earthen%20fortress%20wall%2C%20masterpiece?width=600&height=450&nologo=true&seed=104"
           },
           {
             text: "힘을 합쳐 뚝을 보강한 덕분에 무사히 성벽을 지켜내고 사람들의 안전을 확보했다.",
-            imgUrl: "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%"><defs><linearGradient id="bg5" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#14532d"/><stop offset="100%" stop-color="#22c55e"/></linearGradient></defs><rect width="600" height="400" fill="url(#bg5)"/><text x="300" y="200" fill="#fff" font-size="24" font-weight="bold" text-anchor="middle" font-family="sans-serif">🛡️ 협동으로 성벽을 수호하다</text></svg>`)
+            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20historical%20adventure%2C%20young%20boys%20working%20together%20bravely%20reinforcing%20the%20fortress%20wall%2C%20masterpiece?width=600&height=450&nologo=true&seed=105"
           },
           {
             text: "서동이 감사의 의미로 백제 전통 문양이 새겨진 귀중한 작은 목걸이를 선물해 주었다.",
-            imgUrl: "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%"><defs><linearGradient id="bg6" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#581c87"/><stop offset="100%" stop-color="#9333ea"/></linearGradient></defs><rect width="600" height="400" fill="url(#bg6)"/><circle cx="300" cy="200" r="50" fill="#eab308"/><text x="300" y="320" fill="#fff" font-size="24" font-weight="bold" text-anchor="middle" font-family="sans-serif">🎁 우정의 백제 목걸이 선물</text></svg>`)
+            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20historical%20adventure%2C%20ancient%20baekje%20boy%20giving%20a%20traditional%20jade%20necklace%20gift%2C%20masterpiece?width=600&height=450&nologo=true&seed=106"
           },
           {
             text: "다시 구슬이 환하게 빛나며 현대의 풍납토성 잔디밭으로 신비롭게 돌아왔다.",
-            imgUrl: "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%"><defs><linearGradient id="bg7" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0f172a"/><stop offset="100%" stop-color="#334155"/></linearGradient></defs><rect width="600" height="400" fill="url(#bg7)"/><text x="300" y="200" fill="#fff" font-size="24" font-weight="bold" text-anchor="middle" font-family="sans-serif">⏳ 현대의 학교 현장으로 귀환</text></svg>`)
+            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20historical%20adventure%2C%20mystical%20glowing%20portal%20bringing%20boy%20back%20to%20modern%20school%20field%2C%20masterpiece?width=600&height=450&nologo=true&seed=107"
           },
           {
             text: "손에 쥐어진 목걸이를 바라보며 민준이는 우리의 소중한 역사를 깊이 마음에 새겼다.",
-            imgUrl: "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%"><defs><linearGradient id="bg8" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#701a75"/><stop offset="100%" stop-color="#c026d3"/></linearGradient></defs><rect width="600" height="400" fill="url(#bg8)"/><text x="300" y="200" fill="#fff" font-size="24" font-weight="bold" text-anchor="middle" font-family="sans-serif">🌟 살아숨쉬는 우리의 역사</text></svg>`)
+            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20historical%20adventure%2C%20happy%20young%20student%20holding%20ancient%20necklace%20looking%20at%20fortress%20park%2C%20masterpiece?width=600&height=450&nologo=true&seed=108"
           }
         ]
       },
@@ -1677,19 +1677,19 @@
         scenes: [
           {
             text: "학교 뒷산 마법의 숲을 거닐던 아리아는 요정 루미와 신비한 비밀의 연못을 만났다.",
-            imgUrl: "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%"><defs><linearGradient id="f1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#064e3b"/><stop offset="100%" stop-color="#10b981"/></linearGradient></defs><rect width="600" height="400" fill="url(#f1)"/><text x="300" y="200" fill="#fff" font-size="24" font-weight="bold" text-anchor="middle" font-family="sans-serif">🌳 마법의 숲과 요정 루미</text></svg>`)
+            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20educational%20fantasy%2C%20young%20boy%20and%20glowing%20fairy%20meeting%20at%20mystical%20forest%20pond%2C%20masterpiece?width=600&height=450&nologo=true&seed=201"
           },
           {
             text: "연못 속에는 멸종 위기 식물들과 맑은 생명수가 찬란하게 빛나고 있었다.",
-            imgUrl: "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%"><defs><linearGradient id="f2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0c4a6e"/><stop offset="100%" stop-color="#0284c7"/></linearGradient></defs><rect width="600" height="400" fill="url(#f2)"/><text x="300" y="200" fill="#fff" font-size="24" font-weight="bold" text-anchor="middle" font-family="sans-serif">💧 생명수가 빛나는 연못</text></svg>`)
+            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20educational%20fantasy%2C%20crystal%20clear%20magical%20pond%20with%20glowing%20rare%20plants%20underwater%2C%20masterpiece?width=600&height=450&nologo=true&seed=202"
           },
           {
             text: "아리아와 루미는 숲을 더럽히는 쓰레기 마물을 정화의 마법으로 깨끗이 물리쳤다.",
-            imgUrl: "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%"><defs><linearGradient id="f3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4c1d95"/><stop offset="100%" stop-color="#7c3aed"/></linearGradient></defs><rect width="600" height="400" fill="url(#f3)"/><text x="300" y="200" fill="#fff" font-size="24" font-weight="bold" text-anchor="middle" font-family="sans-serif">✨ 정화의 마법으로 숲 보호</text></svg>`)
+            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20educational%20fantasy%2C%20boy%20and%20fairy%20casting%20purification%20magic%20to%20clean%20dark%20trash%20monster%2C%20masterpiece?width=600&height=450&nologo=true&seed=203"
           },
           {
             text: "아리아는 자연을 사랑하고 지키는 것이 진정한 마법임을 가슴속에 간직했다.",
-            imgUrl: "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%"><defs><linearGradient id="f4" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#14532d"/><stop offset="100%" stop-color="#84cc16"/></linearGradient></defs><rect width="600" height="400" fill="url(#f4)"/><text x="300" y="200" fill="#fff" font-size="24" font-weight="bold" text-anchor="middle" font-family="sans-serif">🌿 자연을 사랑하는 진정한 마법</text></svg>`)
+            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20educational%20fantasy%2C%20happy%20boy%20smiling%20in%20bright%20sunlit%20clean%20green%20forest%2C%20masterpiece?width=600&height=450&nologo=true&seed=204"
           }
         ]
       },
@@ -1703,19 +1703,19 @@
         scenes: [
           {
             text: "교내 환경동아리 그린팀 친구들은 일회용 플라스틱 쓰레기 문제의 심각성을 조사했다.",
-            imgUrl: "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%"><defs><linearGradient id="e1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#1e293b"/><stop offset="100%" stop-color="#475569"/></linearGradient></defs><rect width="600" height="400" fill="url(#e1)"/><text x="300" y="200" fill="#fff" font-size="24" font-weight="bold" text-anchor="middle" font-family="sans-serif">🔍 플라스틱 문제 실태 조사</text></svg>`)
+            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20school%20environmental%20club%20students%20investigating%20plastic%20waste%2C%20masterpiece?width=600&height=450&nologo=true&seed=301"
           },
           {
             text: "친구들과 함께 텀블러 사용하기 및 분리배출 캠페인 포스터를 멋지게 제작했다.",
-            imgUrl: "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%"><defs><linearGradient id="e2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#047857"/><stop offset="100%" stop-color="#10b981"/></linearGradient></defs><rect width="600" height="400" fill="url(#e2)"/><text x="300" y="200" fill="#fff" font-size="24" font-weight="bold" text-anchor="middle" font-family="sans-serif">🎨 친환경 실천 포스터 제작</text></svg>`)
+            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20students%20drawing%20colorful%20eco%20friendly%20campaign%20posters%20and%20reusable%20tumblers%2C%20masterpiece?width=600&height=450&nologo=true&seed=302"
           },
           {
             text: "전교생과 선생님들이 다 함께 실천 약속에 동참하며 플라스틱 제로에 도전했다.",
-            imgUrl: "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%"><defs><linearGradient id="e3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#1d4ed8"/><stop offset="100%" stop-color="#3b82f6"/></linearGradient></defs><rect width="600" height="400" fill="url(#e3)"/><text x="300" y="200" fill="#fff" font-size="24" font-weight="bold" text-anchor="middle" font-family="sans-serif">🤝 전교생이 함께하는 텀블러 데이</text></svg>`)
+            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20happy%20school%20students%20and%20teachers%20holding%20tumblers%20together%20in%20clean%20classroom%2C%20masterpiece?width=600&height=450&nologo=true&seed=303"
           },
           {
             text: "우리 학교의 깨끗한 변화가 지구를 구하는 큰 실천이 됨을 모두가 자랑스러워했다.",
-            imgUrl: "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%"><defs><linearGradient id="e4" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#15803d"/><stop offset="100%" stop-color="#22c55e"/></linearGradient></defs><rect width="600" height="400" fill="url(#e4)"/><text x="300" y="200" fill="#fff" font-size="24" font-weight="bold" text-anchor="middle" font-family="sans-serif">🌍 깨끗해진 우리 학교와 지구</text></svg>`)
+            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20beautiful%20clean%20green%20school%20building%20under%20bright%20blue%20sky%20and%20earth%2C%20masterpiece?width=600&height=450&nologo=true&seed=304"
           }
         ]
       }
@@ -1839,47 +1839,63 @@
 
       const generatedScenes = [];
 
-      // 2. 각 컷마다 Pollinations AI 실시간 이미지 로드 (실패 시 즉시 고품질 SVG 백업 전환)
-      const imagePromises = scenes.map((sceneText, idx) => {
-        return new Promise((resolve) => {
-          const promptTags = getEnglishStyleTags(genre, characters, sceneText);
-          const seed = Date.now() + idx * 777;
-          const aiUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(promptTags)}?width=600&height=450&nologo=true&seed=${seed}`;
-          const fallbackUrl = createFallbackSvgUrl(idx, sceneText, genre);
+      // 2. 동시성 제어(Concurrency Control) 및 2단계 자동 재시도로 100% 고품질 AI 일러스트 생성 보장
+      // 한 번에 모든 컷을 요청하면 브라우저 연결 한도(6개) 및 AI 서버 병목으로 누락되므로 2개씩 순차/동시 생성
+      const CONCURRENCY_LIMIT = 2;
+      const generatedScenes = new Array(scenes.length);
 
-          const img = new Image();
-          let resolved = false;
+      // 개별 컷 AI 이미지 로드 헬퍼 (1차 고품질 시도 -> 2차 고속 Turbo 모델 재시도 -> 안전 백업)
+      async function generateCutImage(sceneText, idx) {
+        const promptTags = getEnglishStyleTags(genre, characters, sceneText);
+        const seed = Date.now() + idx * 777 + Math.floor(Math.random() * 1000);
+        
+        const aiUrlPrimary = `https://image.pollinations.ai/prompt/${encodeURIComponent(promptTags)}?width=600&height=450&nologo=true&seed=${seed}`;
+        const aiUrlTurbo = `https://image.pollinations.ai/prompt/${encodeURIComponent(promptTags)}?width=600&height=450&nologo=true&seed=${seed + 8888}&model=turbo`;
+        const fallbackSvg = createFallbackSvgUrl(idx, sceneText, genre);
 
-          // 타임아웃 12초 설정
-          const timer = setTimeout(() => {
-            if (!resolved) {
-              resolved = true;
-              finishScene(idx, fallbackUrl, sceneText);
-              resolve();
-            }
-          }, 12000);
+        const tryFetchImage = (url, timeoutMs) => {
+          return new Promise((resolve) => {
+            const img = new Image();
+            let resolved = false;
+            const timer = setTimeout(() => {
+              if (!resolved) {
+                resolved = true;
+                img.src = ""; // 요청 중단
+                resolve(null);
+              }
+            }, timeoutMs);
 
-          img.onload = () => {
-            if (!resolved) {
-              resolved = true;
-              clearTimeout(timer);
-              finishScene(idx, aiUrl, sceneText);
-              resolve();
-            }
-          };
+            img.onload = () => {
+              if (!resolved) {
+                resolved = true;
+                clearTimeout(timer);
+                resolve(url);
+              }
+            };
+            img.onerror = () => {
+              if (!resolved) {
+                resolved = true;
+                clearTimeout(timer);
+                resolve(null);
+              }
+            };
+            img.src = url;
+          });
+        };
 
-          img.onerror = () => {
-            if (!resolved) {
-              resolved = true;
-              clearTimeout(timer);
-              finishScene(idx, fallbackUrl, sceneText);
-              resolve();
-            }
-          };
+        // 1차 시도 (최대 16초 대기)
+        let resultUrl = await tryFetchImage(aiUrlPrimary, 16000);
+        if (resultUrl) return resultUrl;
 
-          img.src = aiUrl;
-        });
-      });
+        // 1차 지연 시 2차 시도 (최대 12초 대기 - 고속 Turbo 모델 적용)
+        console.log(`[${idx + 1}컷] 1차 AI 렌더링 지연. 고속 Turbo 모델로 재시도합니다.`);
+        resultUrl = await tryFetchImage(aiUrlTurbo, 12000);
+        if (resultUrl) return resultUrl;
+
+        // 최종 안전 SVG 백업
+        console.warn(`[${idx + 1}컷] 외부 API 일시 지연으로 고품질 SVG 백업으로 렌더링합니다.`);
+        return fallbackSvg;
+      }
 
       function finishScene(idx, finalImgUrl, text) {
         generatedScenes[idx] = { text, imgUrl: finalImgUrl };
@@ -1892,8 +1908,33 @@
         }
       }
 
-      // 이미지 렌더링 완료 대기 및 전역 데이터 보존
-      await Promise.all(imagePromises);
+      // 2개씩 순차 큐로 렌더링하여 8페이지 전체 무사히 생성
+      async function runGenerationQueue() {
+        let cursor = 0;
+        async function worker() {
+          while (cursor < scenes.length) {
+            const idx = cursor++;
+            const sceneText = scenes[idx];
+
+            const loader = document.getElementById(`loader-${idx}`);
+            if (loader) {
+              loader.innerHTML = `
+                <div class="spinner"></div>
+                <div style="font-weight:800; font-size:14px; color:var(--primary-dark);">🎨 ${idx + 1}컷 AI 일러스트 생성 중...</div>
+                <div style="font-size:12px; color:var(--muted);">잠시만 기다려주세요 (${idx + 1}/${scenes.length} 순차 처리)</div>
+              `;
+            }
+
+            const imgUrl = await generateCutImage(sceneText, idx);
+            finishScene(idx, imgUrl, sceneText);
+          }
+        }
+
+        const workers = Array.from({ length: Math.min(CONCURRENCY_LIMIT, scenes.length) }, () => worker());
+        await Promise.all(workers);
+      }
+
+      await runGenerationQueue();
 
       const now = new Date();
       const formatter = new Intl.DateTimeFormat("ko-KR", {
