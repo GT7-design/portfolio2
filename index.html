@@ -1472,6 +1472,7 @@
     };
 
     // 3. 로그아웃 핸들러 (어떤 상황에서도 확실하게 화면을 로그아웃 상태로 돌림)
+    window.currentActiveUser = null;
     window.logout = async function() {
       window.currentActiveUser = null;
       const ls = document.getElementById("loginScreen");
@@ -1512,6 +1513,16 @@
         window.firebaseLogin();
       } else {
         alert("현재 접속 환경(로컬 file:// 또는 네트워크 연결 지연)에서는 구글 로그인 라이브러리를 불러올 수 없습니다.\n\n구글 계정 인증 대신 체험을 원하시면 옆의 '⚡ 시연용 계정 즉시 로그인' 버튼을 이용해 주세요.");
+      }
+    };
+
+    window.openApp = function(email) {
+      document.getElementById("loginScreen").classList.add("hidden");
+      document.getElementById("appScreen").classList.remove("hidden");
+      const pill = document.getElementById("userPill");
+      if (pill) {
+        const isDemo = window.currentActiveUser?.isDemo;
+        pill.innerHTML = isDemo ? `⚡ 시연 계정: <strong>${email}</strong>` : `🟢 인증 계정: <strong>${email}</strong>`;
       }
     };
 
@@ -1648,6 +1659,12 @@
     }
 
     // [9] 웹툰 생성 코어 로직 (동기 전역 등록으로 클릭 즉시 100% 작동)
+    window.generateAI = function() {
+      if (typeof window.generateWebtoon === "function") {
+        window.generateWebtoon();
+      }
+    };
+
     window.generateWebtoon = async function() {
       const title = document.getElementById("titleInput").value.trim();
       const characters = document.getElementById("charactersInput").value.trim();
@@ -1662,27 +1679,57 @@
 
       const scenes = splitIntoScenes(story, cuts);
       const panelGrid = document.getElementById("panelGrid");
-      document.getElementById("bookViewAction").style.display = "block";
+      const bookViewAction = document.getElementById("bookViewAction");
+      if (bookViewAction) bookViewAction.style.display = "block";
 
-      panelGrid.innerHTML = scenes.map((scene, idx) => `
-        <div class="toon-panel" id="panel-${idx}">
-          <div class="toon-visual">
-            <div class="skeleton-loader" id="loader-${idx}">
-              <div class="spinner"></div>
-              <div style="font-weight:800; font-size:14px; color:var(--primary-dark);">🎨 ${idx + 1}컷 AI 일러스트 렌더링 중...</div>
-              <div style="font-size:12px; color:var(--muted);">잠시만 기다려주세요 (약 5~10초)</div>
+      if (panelGrid) {
+        panelGrid.innerHTML = scenes.map((scene, idx) => `
+          <div class="toon-panel" id="panel-${idx}">
+            <div class="toon-visual">
+              <div class="skeleton-loader" id="loader-${idx}">
+                <div class="spinner"></div>
+                <div style="font-weight:800; font-size:14px; color:var(--primary-dark);">🎨 ${idx + 1}컷 AI 일러스트 렌더링 중...</div>
+                <div style="font-size:12px; color:var(--muted);">잠시만 기다려주세요 (약 5~10초)</div>
+              </div>
+            </div>
+            <div class="toon-body">
+              <h4>${idx + 1}컷 · ${shorten(scene, 18)}</h4>
+              <p><strong>📜 이야기 내용</strong><br>${scene}</p>
+              <div class="prompt-box">💬 <strong>AI 연출 키워드:</strong> ${genre}, ${characters}, ${shorten(scene, 40)}</div>
             </div>
           </div>
-          <div class="toon-body">
-            <h4>${idx + 1}컷 · ${shorten(scene, 18)}</h4>
-            <p><strong>📜 이야기 내용</strong><br>${scene}</p>
-            <div class="prompt-box">💬 <strong>AI 연출 키워드:</strong> ${genre}, ${characters}, ${shorten(scene, 40)}</div>
-          </div>
-        </div>
-      `).join("");
+        `).join("");
+      }
 
-      const CONCURRENCY_LIMIT = 2;
       const generatedScenes = new Array(scenes.length);
+
+      const tryFetchImage = (url, timeoutMs) => {
+        return new Promise((resolve) => {
+          const img = new Image();
+          let resolved = false;
+          const timer = setTimeout(() => {
+            if (!resolved) {
+              resolved = true;
+              resolve(null);
+            }
+          }, timeoutMs);
+          img.onload = () => {
+            if (!resolved) {
+              resolved = true;
+              clearTimeout(timer);
+              resolve(url);
+            }
+          };
+          img.onerror = () => {
+            if (!resolved) {
+              resolved = true;
+              clearTimeout(timer);
+              resolve(null);
+            }
+          };
+          img.src = url;
+        });
+      };
 
       async function generateCutImage(sceneText, idx) {
         const aiEngine = document.getElementById("aiEngineSelect")?.value || "gemini-flash";
@@ -1736,13 +1783,9 @@ Rules:
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 contents: [{
-                  parts: [{
-                    text: promptTags
-                  }]
+                  parts: [{ text: promptTags }]
                 }],
-                generationConfig: {
-                  responseModalities: ["IMAGE"]
-                }
+                generationConfig: { responseModalities: ["IMAGE"] }
               })
             });
             const data = await response.json();
@@ -1782,10 +1825,60 @@ Rules:
         const aiUrlTurbo = `https://image.pollinations.ai/prompt/${encodeURIComponent(promptTags)}?width=600&height=450&nologo=true&seed=${seed + 8888}&model=turbo`;
         const fallbackArt = generateMeaningfulSceneArt(idx, sceneText, genre, characters);
 
-        const tryFetchImage = (url, timeoutMs) => {
-          return new Promise((resolve) => {
-            const img = new Image();
-            let resolved = false    window.saveGeminiKey = function(val) {
+        let imgUrl = await tryFetchImage(aiUrlPrimary, 8000);
+        if (!imgUrl) {
+          imgUrl = await tryFetchImage(aiUrlTurbo, 6000);
+        }
+        if (!imgUrl) {
+          imgUrl = fallbackArt;
+        }
+        return imgUrl;
+      }
+
+      function finishScene(idx, finalImgUrl, text) {
+        generatedScenes[idx] = { text, imgUrl: finalImgUrl };
+        const visualWrap = document.querySelector(`#panel-${idx} .toon-visual`);
+        if (visualWrap) {
+          visualWrap.innerHTML = `
+            <img src="${finalImgUrl}" alt="Scene ${idx + 1}" style="animation: fadeIn 0.4s ease; width:100%; height:100%; object-fit:cover; border-radius:18px;">
+            <div class="toon-number">${idx + 1}</div>
+          `;
+        }
+      }
+
+      await Promise.all(scenes.map(async (sceneText, idx) => {
+        try {
+          const imgUrl = await generateCutImage(sceneText, idx);
+          finishScene(idx, imgUrl, sceneText);
+        } catch (e) {
+          console.warn(`[${idx + 1}컷] 이미지 생성 에러, fallback 사용:`, e);
+          finishScene(idx, generateMeaningfulSceneArt(idx, sceneText, genre, characters), sceneText);
+        }
+      }));
+
+      const now = new Date();
+      const formatter = new Intl.DateTimeFormat("ko-KR", {
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+      });
+      const createdAtStr = formatter.format(now);
+      const userEmail = window.currentActiveUser?.email || "demo@school.kr";
+
+      window.currentWebtoonData = {
+        title, characters, genre, cuts,
+        createdAtStr, createdBy: userEmail,
+        scenes: generatedScenes
+      };
+
+      if (typeof window.saveLocalHistory === "function") {
+        window.saveLocalHistory(window.currentWebtoonData);
+      }
+      if (typeof window.saveToFirestoreIfPossible === "function") {
+        window.saveToFirestoreIfPossible(window.currentWebtoonData);
+      }
+    };
+
+    window.saveGeminiKey = function(val) {
       if (val && val.trim()) {
         localStorage.setItem("portfolio2_gemini_key", val.trim());
       } else {
@@ -1794,7 +1887,7 @@ Rules:
     };
 
     // [우수 예시 작품 갤러리 즉시 감상 (실시간 AI 일러스트 연동)]
-    const SAMPLE_WORKS = {
+    window.SAMPLE_WORKS = {
       historyBook: {
         title: "백제 왕성 풍납토성의 비밀",
         characters: "민준, 백제 소년 서동",
@@ -1892,24 +1985,24 @@ Rules:
     };
 
     window.loadSampleWork = function(key) {
-      const data = SAMPLE_WORKS[key];
+      const data = window.SAMPLE_WORKS[key];
       if (!data) return;
       window.currentWebtoonData = data;
-      renderPanelGrid(data.scenes, data.genre, data.characters);
-      document.getElementById("bookViewAction").style.display = "block";
+      window.renderPanelGrid(data.scenes, data.genre, data.characters);
+      const bookAction = document.getElementById("bookViewAction");
+      if (bookAction) bookAction.style.display = "block";
       
       const resCard = document.getElementById("panelGrid") ? document.getElementById("panelGrid").closest(".card") : null;
       if (resCard) resCard.scrollIntoView({ behavior: "smooth", block: "start" });
       
       setTimeout(() => {
         if (confirm(`[${data.title}] 예시 작품이 오른쪽 결과 패널에 로드되었습니다.\n지금 바로 단행본(Storybook) 전자책 뷰어로 펼쳐보시겠습니까?`)) {
-          openBookView();
+          window.openBookView();
         }
       }, 300);
     };
 
-    // 로컬 역사 저장소 및 로그인 전역화
-    window.currentActiveUser = null;
+    // 로컬 스토리지 및 Firestore 통합 역사 목록 관리
     window.historyList = [];
 
     window.loadLocalHistory = function() {
@@ -1923,6 +2016,12 @@ Rules:
       window.historyList.unshift(item);
       if (window.historyList.length > 20) window.historyList = window.historyList.slice(0, 20);
       localStorage.setItem("portfolio2_webtoons", JSON.stringify(window.historyList));
+      window.renderHistory();
+    };
+
+    window.mergeAndRenderHistory = function(firestoreItems) {
+      const localOnly = window.historyList.filter(item => !firestoreItems.some(f => f.title === item.title && f.createdAtStr === item.createdAtStr));
+      window.historyList = [...firestoreItems, ...localOnly];
       window.renderHistory();
     };
 
@@ -1954,8 +2053,9 @@ Rules:
         return;
       }
       window.currentWebtoonData = item;
-      renderPanelGrid(item.scenes, item.genre, item.characters);
-      document.getElementById("bookViewAction").style.display = "block";
+      window.renderPanelGrid(item.scenes, item.genre, item.characters);
+      const bookAction = document.getElementById("bookViewAction");
+      if (bookAction) bookAction.style.display = "block";
       alert(`[${item.title}] 작품을 화면과 단행본 뷰어에 불러왔습니다.`);
     };
 
@@ -1967,36 +2067,184 @@ Rules:
       }
     };
 
-    window.fillDemoAndLogin = function() {
-      const emailInput = document.getElementById("loginEmail");
-      if (emailInput) {
-        emailInput.value = "demo@school.kr";
-        emailInput.style.borderColor = "#7c3aed";
-        emailInput.style.backgroundColor = "#f3e8ff";
-      }
-      setTimeout(() => {
-        const demoUser = { email: "demo@school.kr", name: "시연용 교사/학생 계정", isDemo: true };
-        window.currentActiveUser = demoUser;
-        window.openApp(demoUser.email);
-        window.subscribeAndLoadHistory();
-      }, 300);
+    window.renderPanelGrid = function(scenesData, genre, characters) {
+      const panelGrid = document.getElementById("panelGrid");
+      if (!panelGrid) return;
+      panelGrid.innerHTML = scenesData.map((data, idx) => `
+        <div class="toon-panel">
+          <div class="toon-visual">
+            <img src="${data.imgUrl}" alt="Scene ${idx + 1}" style="width:100%; height:100%; object-fit:cover; border-radius:18px;">
+            <div class="toon-number">${idx + 1}</div>
+          </div>
+          <div class="toon-body">
+            <h4>${idx + 1}컷 · ${shorten(data.text, 18)}</h4>
+            <p><strong>📜 이야기 내용</strong><br>${data.text}</p>
+            <div class="prompt-box">💬 <strong>AI 연출 키워드:</strong> ${genre}, ${characters}, ${shorten(data.text, 40)}</div>
+          </div>
+        </div>
+      `).join("");
     };
 
-    window.openApp = function(email) {
-      document.getElementById("loginScreen").classList.add("hidden");
-      document.getElementById("appScreen").classList.remove("hidden");
-      const pill = document.getElementById("userPill");
-      if (pill) {
-        const isDemo = window.currentActiveUser?.isDemo;
-        pill.innerHTML = isDemo ? `⚡ 시연 계정: <strong>${email}</strong>` : `🟢 인증 계정: <strong>${email}</strong>`;
+    // [책 형태로 보기 (Storybook / Flipbook Reader) 모드 제어]
+    window.currentBookPage = 0; // 0: 표지, 1..N: 컷 페이지
+    window.isBookScrollMode = false;
+
+    window.openBookView = function() {
+      if (!window.currentWebtoonData) {
+        alert("먼저 웹툰 컷을 생성해 주세요!");
+        return;
       }
+      window.currentBookPage = 0;
+      window.isBookScrollMode = false;
+      const modeBtn = document.getElementById("modeToggleBtn");
+      if (modeBtn) modeBtn.textContent = "📜 전체 스크롤 보기로 전환";
+      const navBar = document.getElementById("bookNavBar");
+      if (navBar) navBar.style.display = "flex";
+      renderBookPage();
+      window.openModal("bookModal");
+    };
+
+    window.changeBookPage = function(delta) {
+      const totalPages = window.currentWebtoonData.scenes.length;
+      window.currentBookPage += delta;
+      if (window.currentBookPage < 0) window.currentBookPage = 0;
+      if (window.currentBookPage > totalPages) window.currentBookPage = totalPages;
+      renderBookPage();
+      const viewer = document.getElementById("bookViewer");
+      if (viewer) viewer.scrollTop = 0;
+    };
+
+    window.goToBookCover = function() {
+      window.currentBookPage = 0;
+      renderBookPage();
+    };
+
+    window.toggleBookMode = function() {
+      window.isBookScrollMode = !window.isBookScrollMode;
+      const btn = document.getElementById("modeToggleBtn");
+      const nav = document.getElementById("bookNavBar");
+      if (window.isBookScrollMode) {
+        if (btn) btn.textContent = "📑 페이지 넘기기 모드로 전환";
+        if (nav) nav.style.display = "none";
+        renderBookScrollAll();
+      } else {
+        if (btn) btn.textContent = "📜 전체 스크롤 보기로 전환";
+        if (nav) nav.style.display = "flex";
+        renderBookPage();
+      }
+    };
+
+    function renderBookPage() {
+      const data = window.currentWebtoonData;
+      const viewer = document.getElementById("bookViewer");
+      const counter = document.getElementById("pageCounter");
+      const prevBtn = document.getElementById("prevPageBtn");
+      const nextBtn = document.getElementById("nextPageBtn");
+      if (!viewer || !data) return;
+
+      const totalPages = data.scenes.length;
+
+      if (window.currentBookPage === 0) {
+        if (counter) counter.textContent = "📕 책 표지";
+        if (prevBtn) prevBtn.disabled = true;
+        if (nextBtn) nextBtn.disabled = false;
+        viewer.innerHTML = `
+          <div class="book-page-card book-cover">
+            <span class="book-cover-badge">🏫 서울풍납초등학교 AI 웹툰 창작소 출판 단행본</span>
+            <h1>${data.title}</h1>
+            <div class="book-cover-meta">
+              <strong>🏷️ 장르:</strong> ${data.genre} &nbsp;|&nbsp; <strong>🖼️ 구성:</strong> 총 ${data.cuts}컷<br>
+              <strong>👥 등장인물:</strong> ${data.characters}<br>
+              <strong>✍️ 작가:</strong> ${data.createdBy}
+            </div>
+            <div style="margin:24px auto; width:min(500px, 100%); aspect-ratio:16/10; border-radius:18px; overflow:hidden; box-shadow:0 12px 24px rgba(0,0,0,0.1); border:1px solid var(--line);">
+              <img src="${data.scenes[0]?.imgUrl || window.CONFIG.LOGO_URL}" style="width:100%; height:100%; object-fit:cover;">
+            </div>
+            <button class="btn btn-primary" style="padding:14px 28px; font-size:16px; margin-top:10px;" onclick="changeBookPage(1)">
+              📖 제 1장 펼치기 (이야기 시작) ▶
+            </button>
+          </div>
+        `;
+      } else {
+        const idx = window.currentBookPage - 1;
+        const scene = data.scenes[idx];
+        if (counter) counter.textContent = `${window.currentBookPage} / ${totalPages} 페이지`;
+        if (prevBtn) prevBtn.disabled = false;
+        if (nextBtn) nextBtn.disabled = (window.currentBookPage === totalPages);
+
+        viewer.innerHTML = `
+          <div class="book-page-card">
+            <div class="book-page-header">
+              <span>📚 ${data.title}</span>
+              <span>제 ${idx + 1}장 (${idx + 1} / ${totalPages})</span>
+            </div>
+            <div class="book-page-image-wrap">
+              <img src="${scene.imgUrl}" alt="Scene ${idx + 1}">
+            </div>
+            <div class="book-page-body">
+              <h4>제 ${idx + 1}장 · 사건 전개</h4>
+              <div class="book-page-story">📜 ${scene.text}</div>
+              <div class="book-page-prompt">💡 <strong>AI 장면 연출 정보:</strong> ${data.genre}, ${data.characters}, ${shorten(scene.text, 50)}</div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function renderBookScrollAll() {
+      const data = window.currentWebtoonData;
+      const viewer = document.getElementById("bookViewer");
+      if (!viewer || !data) return;
+
+      let html = `
+        <div class="book-page-card book-cover" style="margin-bottom:28px;">
+          <span class="book-cover-badge">🏫 서울풍납초등학교 AI 웹툰 창작소 출판 단행본</span>
+          <h1>${data.title}</h1>
+          <div class="book-cover-meta">
+            <strong>🏷️ 장르:</strong> ${data.genre} &nbsp;|&nbsp; <strong>🖼️ 구성:</strong> 총 ${data.cuts}컷<br>
+            <strong>👥 등장인물:</strong> ${data.characters} &nbsp;|&nbsp; <strong>✍️ 작가:</strong> ${data.createdBy}
+          </div>
+        </div>
+      `;
+
+      data.scenes.forEach((scene, idx) => {
+        html += `
+          <div class="book-page-card" style="margin-bottom:28px;">
+            <div class="book-page-header">
+              <span>📚 ${data.title}</span>
+              <span>제 ${idx + 1}장</span>
+            </div>
+            <div class="book-page-image-wrap">
+              <img src="${scene.imgUrl}" alt="Scene ${idx + 1}">
+            </div>
+            <div class="book-page-body">
+              <h4>제 ${idx + 1}장 · 사건 전개</h4>
+              <div class="book-page-story">📜 ${scene.text}</div>
+              <div class="book-page-prompt">💡 <strong>AI 장면 연출 정보:</strong> ${data.genre}, ${data.characters}, ${shorten(scene.text, 50)}</div>
+            </div>
+          </div>
+        `;
+      });
+
+      viewer.innerHTML = html;
+    }
+
+    // 모달 제어 함수
+    window.openModal = function(id) {
+      document.getElementById(id)?.classList.add("show");
+    };
+    window.closeModal = function(id) {
+      document.getElementById(id)?.classList.remove("show");
+    };
+    window.handleModalClick = function(event, id) {
+      if (event.target.id === id) window.closeModal(id);
     };
 
     // 초기 실행
-    setLogosAndLinks();
-    subscribeAndLoadHistory();
+    window.setLogosAndLinks();
+    window.subscribeAndLoadHistory();
 
-    // 저장된 Gemini API 키 불러오기
+    // 저장된 Gemini API 키 불러오거나 자동 기입
     const savedKey = localStorage.getItem("portfolio2_gemini_key") || atob("QVEuQWI4Uk42S0Y4aGV3bGVlemk2NWNCWkVwVGp3Q3NFLVo5MUowVWpoUXR5eUF0aWlXX1E=");
     localStorage.setItem("portfolio2_gemini_key", savedKey);
     const keyInput = document.getElementById("geminiApiKeyInput");
@@ -2023,9 +2271,7 @@ Rules:
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    // (CONFIG 및 setLogosAndLinks는 상단 전역 동기 스크립트로 분리 완료)
-
-    // [2] Google 계정 로그인 (실제 구글 팝업 로그인 시도, 에러 발생 시 시연 계정으로 강제 전환하지 않음)
+    // Google 계정 팝업 로그인
     window.firebaseLogin = async function() {
       try {
         const result = await signInWithPopup(auth, provider);
@@ -2043,15 +2289,15 @@ Rules:
           name: result.user.displayName || email.split("@")[0],
           isDemo: false
         };
-        window.openApp(result.user.email);
-        window.subscribeAndLoadHistory();
+        if (typeof window.openApp === "function") window.openApp(result.user.email);
+        if (typeof window.subscribeAndLoadHistory === "function") window.subscribeAndLoadHistory();
       } catch (error) {
         console.warn("구글 계정 팝업 인증 에러:", error);
         alert("구글 계정 로그인 중 오류가 발생했습니다: (" + (error.message || error) + ")\n\n※ 로컬 파일(file://) 환경이나 미등록 도메인에서는 구글 팝업 인증이 브라우저 및 구글 보안 정책상 제한됩니다. 로컬 테스트 시에는 옆의 '⚡ 시연용 계정 즉시 로그인' 버튼을 눌러 바로 입장해주세요.");
       }
     };
 
-    // [3] Firebase 로그아웃 연동
+    // Firebase 로그아웃
     window.firebaseSignOut = async function() {
       if (auth.currentUser) {
         await signOut(auth);
@@ -2077,7 +2323,6 @@ Rules:
       }
     };
 
-    // Firebase 상태 감지
     onAuthStateChanged(auth, (user) => {
       if (user && !window.currentActiveUser?.isDemo) {
         window.currentActiveUser = {
@@ -2085,8 +2330,8 @@ Rules:
           name: user.displayName || user.email.split("@")[0],
           isDemo: false
         };
-        window.openApp(user.email);
-        window.subscribeAndLoadHistory();
+        if (typeof window.openApp === "function") window.openApp(user.email);
+        if (typeof window.subscribeAndLoadHistory === "function") window.subscribeAndLoadHistory();
       }
     });
 
@@ -2099,242 +2344,17 @@ Rules:
           snapshot.forEach((doc) => {
             firestoreItems.push({ id: doc.id, ...doc.data() });
           });
-          window.mergeAndRenderHistory(firestoreItems);
+          if (typeof window.mergeAndRenderHistory === "function") {
+            window.mergeAndRenderHistory(firestoreItems);
+          }
         }, (error) => {
           console.warn("Firestore 읽기 알림 (시연 모드 또는 규칙 보호):", error.message);
-          window.renderHistory();
+          if (typeof window.renderHistory === "function") window.renderHistory();
         });
       } catch (e) {
-        window.renderHistory();
+        if (typeof window.renderHistory === "function") window.renderHistory();
       }
     };
-  </script>
-</body>
-</html>
-          email: user.email,
-          name: user.displayName || user.email.split("@")[0],
-          isDemo: false
-        };
-        openApp(user.email);
-        subscribeAndLoadHistory();
-      }
-    });
-
-    function openApp(email) {
-      document.getElementById("loginScreen").classList.add("hidden");
-      document.getElementById("appScreen").classList.remove("hidden");
-      const pill = document.getElementById("userPill");
-      if (pill) {
-        const isDemo = window.currentActiveUser?.isDemo;
-        pill.innerHTML = isDemo ? `⚡ 시연 계정: <strong>${email}</strong>` : `🟢 인증 계정: <strong>${email}</strong>`;
-      }
-    }
-
-    // [4] 데이터 저장 및 불러오기 (Firestore + 로컬 스토리지 병합 관리로 100% 오류 방지)
-    let unsubscribe = null;
-    let historyList = [];
-
-    function subscribeAndLoadHistory() {
-      // 로컬 스토리지 데이터 먼저 로드
-      loadLocalHistory();
-
-      // Firebase Firestore 실시간 연동 시도
-      try {
-        const q = query(collection(db, "webtoons"), orderBy("createdAt", "desc"), limit(12));
-        unsubscribe = onSnapshot(q, (snapshot) => {
-          const firestoreItems = [];
-          snapshot.forEach((doc) => {
-            firestoreItems.push({ id: doc.id, ...doc.data() });
-          });
-          // 로컬 데이터와 합쳐서 중복 없이 렌더링
-          mergeAndRenderHistory(firestoreItems);
-        }, (error) => {
-          console.warn("Firestore 읽기 알림 (시연 모드 또는 규칙 보호):", error.message);
-          renderHistory();
-        });
-      } catch (e) {
-        renderHistory();
-      }
-    }
-
-    function loadLocalHistory() {
-      const saved = localStorage.getItem("portfolio2_webtoons");
-      if (saved) {
-        try { historyList = JSON.parse(saved); } catch (e) { historyList = []; }
-      }
-    }
-
-    function saveLocalHistory(item) {
-      historyList.unshift(item);
-      if (historyList.length > 20) historyList = historyList.slice(0, 20);
-      localStorage.setItem("portfolio2_webtoons", JSON.stringify(historyList));
-    }
-
-    function mergeAndRenderHistory(firestoreItems) {
-      const localOnly = historyList.filter(item => !firestoreItems.some(f => f.title === item.title && f.createdAtStr === item.createdAtStr));
-      historyList = [...firestoreItems, ...localOnly];
-      renderHistory();
-    }
-
-    function renderHistory() {
-      const ul = document.getElementById("historyList");
-      if (!ul) return;
-      if (!historyList.length) {
-        ul.innerHTML = `<li style="text-align:center; color:var(--muted); padding:20px;">아직 생성된 작품이 없습니다. 위에서 스토리를 작성하고 생성해 보세요!</li>`;
-        return;
-      }
-      ul.innerHTML = historyList.map((item, idx) => `
-        <li onclick="loadSavedWebtoon(${idx})">
-          <div class="history-title">
-            <span>📚 ${item.title}</span>
-            <span class="card-title" style="font-size:12px;">${item.cuts}컷 · ${item.genre}</span>
-          </div>
-          <div class="history-meta">
-            <span>👤 작성자: ${item.createdBy || "시연 계정"}</span> &nbsp;|&nbsp;
-            <span>🕒 ${item.createdAtStr || "최근 생성"}</span>
-          </div>
-        </li>
-      `).join("");
-    }
-
-    window.loadSavedWebtoon = function(idx) {
-      const item = historyList[idx];
-      if (!item || !item.scenes) {
-        alert("이전 버전 기록이거나 상세 컷 데이터가 없습니다.");
-        return;
-      }
-      window.currentWebtoonData = item;
-      renderPanelGrid(item.scenes, item.genre, item.characters);
-      document.getElementById("bookViewAction").style.display = "block";
-      alert(`[${item.title}] 작품을 화면과 단행본 뷰어에 불러왔습니다.`);
-    };
-
-    // [추천 주제 로직은 전역 동기 스크립트로 상향됨]
-
-    // [우수 예시 작품 갤러리 즉시 감상 (실시간 AI 일러스트 연동)]
-    const SAMPLE_WORKS = {
-      historyBook: {
-        title: "백제 왕성 풍납토성의 비밀",
-        characters: "민준, 백제 소년 서동",
-        genre: "역사 모험",
-        cuts: 8,
-        createdAtStr: "예시 작품 (추천 갤러리)",
-        createdBy: "서울풍납초 AI 창작소",
-        scenes: [
-          {
-            text: "풍납토성 현장체험학습을 간 민준이는 안내판 옆에서 이상하게 빛나는 옥구슬을 발견했다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20historical%20adventure%2C%20young%20boy%20discovering%20a%20glowing%20mystical%20jade%20orb%20near%20an%20ancient%20earthen%20fortress%20wall%2C%20vivid%20colors%2C%20masterpiece?width=600&height=450&nologo=true&seed=101"
-          },
-          {
-            text: "구슬을 만지는 순간 신비한 황금빛과 함께 1,700년 전 백제 왕성 시절로 시간 이동을 하게 되었다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20historical%20adventure%2C%20golden%20magical%20time%20travel%20portal%20opening%20above%20ancient%20korean%20baekje%20palace%2C%20cinematic%20lighting%2C%20masterpiece?width=600&height=450&nologo=true&seed=102"
-          },
-          {
-            text: "그곳에서 또래의 백제 소년 서동을 만나 왕성의 북적이는 시장과 거대한 흙 성벽을 쌓는 장인들을 보았다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20historical%20adventure%2C%20two%20young%20boys%20meeting%20in%20ancient%20baekje%20kingdom%20bustling%20traditional%20marketplace%2C%20masterpiece?width=600&height=450&nologo=true&seed=103"
-          },
-          {
-            text: "갑자기 거센 비바람이 불어 성벽 일부가 무너질 위기에 처하자, 민준이와 서동은 사람들에게 위험을 알렸다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20historical%20adventure%2C%20heavy%20rainstorm%20and%20workers%20protecting%20an%20ancient%20earthen%20fortress%20wall%2C%20masterpiece?width=600&height=450&nologo=true&seed=104"
-          },
-          {
-            text: "힘을 합쳐 뚝을 보강한 덕분에 무사히 성벽을 지켜내고 사람들의 안전을 확보했다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20historical%20adventure%2C%20young%20boys%20working%20together%20bravely%20reinforcing%20the%20fortress%20wall%2C%20masterpiece?width=600&height=450&nologo=true&seed=105"
-          },
-          {
-            text: "서동이 감사의 의미로 백제 전통 문양이 새겨진 귀중한 작은 목걸이를 선물해 주었다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20historical%20adventure%2C%20ancient%20baekje%20boy%20giving%20a%20traditional%20jade%20necklace%20gift%2C%20masterpiece?width=600&height=450&nologo=true&seed=106"
-          },
-          {
-            text: "다시 구슬이 환하게 빛나며 현대의 풍납토성 잔디밭으로 신비롭게 돌아왔다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20historical%20adventure%2C%20mystical%20glowing%20portal%20bringing%20boy%20back%20to%20modern%20school%20field%2C%20masterpiece?width=600&height=450&nologo=true&seed=107"
-          },
-          {
-            text: "손에 쥐어진 목걸이를 바라보며 민준이는 우리의 소중한 역사를 깊이 마음에 새겼다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20historical%20adventure%2C%20happy%20young%20student%20holding%20ancient%20necklace%20looking%20at%20fortress%20park%2C%20masterpiece?width=600&height=450&nologo=true&seed=108"
-          }
-        ]
-      },
-      fantasyBook: {
-        title: "마법의 숲과 비밀의 연못",
-        characters: "소년 아리아, 요정 루미",
-        genre: "교육 판타지",
-        cuts: 4,
-        createdAtStr: "예시 작품 (추천 갤러리)",
-        createdBy: "서울풍납초 AI 창작소",
-        scenes: [
-          {
-            text: "학교 뒷산 마법의 숲을 거닐던 아리아는 요정 루미와 신비한 비밀의 연못을 만났다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20educational%20fantasy%2C%20young%20boy%20and%20glowing%20fairy%20meeting%20at%20mystical%20forest%20pond%2C%20masterpiece?width=600&height=450&nologo=true&seed=201"
-          },
-          {
-            text: "연못 속에는 멸종 위기 식물들과 맑은 생명수가 찬란하게 빛나고 있었다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20educational%20fantasy%2C%20crystal%20clear%20magical%20pond%20with%20glowing%20rare%20plants%20underwater%2C%20masterpiece?width=600&height=450&nologo=true&seed=202"
-          },
-          {
-            text: "아리아와 루미는 숲을 더럽히는 쓰레기 마물을 정화의 마법으로 깨끗이 물리쳤다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20educational%20fantasy%2C%20boy%20and%20fairy%20casting%20purification%20magic%20to%20clean%20dark%20trash%20monster%2C%20masterpiece?width=600&height=450&nologo=true&seed=203"
-          },
-          {
-            text: "아리아는 자연을 사랑하고 지키는 것이 진정한 마법임을 가슴속에 간직했다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20educational%20fantasy%2C%20happy%20boy%20smiling%20in%20bright%20sunlit%20clean%20green%20forest%2C%20masterpiece?width=600&height=450&nologo=true&seed=204"
-          }
-        ]
-      },
-      ecoBook: {
-        title: "우리가 만드는 탄소중립 학교",
-        characters: "환경동아리 그린팀 친구들",
-        genre: "환경 캠페인",
-        cuts: 4,
-        createdAtStr: "예시 작품 (추천 갤러리)",
-        createdBy: "서울풍납초 AI 창작소",
-        scenes: [
-          {
-            text: "교내 환경동아리 그린팀 친구들은 일회용 플라스틱 쓰레기 문제의 심각성을 조사했다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20school%20environmental%20club%20students%20investigating%20plastic%20waste%2C%20masterpiece?width=600&height=450&nologo=true&seed=301"
-          },
-          {
-            text: "친구들과 함께 텀블러 사용하기 및 분리배출 캠페인 포스터를 멋지게 제작했다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20students%20drawing%20colorful%20eco%20friendly%20campaign%20posters%20and%20reusable%20tumblers%2C%20masterpiece?width=600&height=450&nologo=true&seed=302"
-          },
-          {
-            text: "전교생과 선생님들이 다 함께 실천 약속에 동참하며 플라스틱 제로에 도전했다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20happy%20school%20students%20and%20teachers%20holding%20tumblers%20together%20in%20clean%20classroom%2C%20masterpiece?width=600&height=450&nologo=true&seed=303"
-          },
-          {
-            text: "우리 학교의 깨끗한 변화가 지구를 구하는 큰 실천이 됨을 모두가 자랑스러워했다.",
-            imgUrl: "https://image.pollinations.ai/prompt/korean%20webtoon%20style%2C%20beautiful%20clean%20green%20school%20building%20under%20bright%20blue%20sky%20and%20earth%2C%20masterpiece?width=600&height=450&nologo=true&seed=304"
-          }
-        ]
-      }
-    };
-
-    window.loadSampleWork = function(key) {
-      const data = SAMPLE_WORKS[key];
-      if (!data) return;
-      window.currentWebtoonData = data;
-      renderPanelGrid(data.scenes, data.genre, data.characters);
-      document.getElementById("bookViewAction").style.display = "block";
-      
-      const resCard = document.getElementById("panelGrid") ? document.getElementById("panelGrid").closest(".card") : null;
-      if (resCard) resCard.scrollIntoView({ behavior: "smooth", block: "start" });
-      
-      setTimeout(() => {
-        if (confirm(`[${data.title}] 예시 작품이 오른쪽 결과 패널에 로드되었습니다.\n지금 바로 단행본(Storybook) 전자책 뷰어로 펼쳐보시겠습니까?`)) {
-          openBookView();
-        }
-      }, 300);
-    };
-
-    // 초기 실행
-    setLogosAndLinks();
-    subscribeAndLoadHistory();
-
-    // 저장된 Gemini API 키 불러오거나 자동 기입
-    const savedKey = localStorage.getItem("portfolio2_gemini_key") || atob("QVEuQWI4Uk42S0Y4aGV3bGVlemk2NWNCWkVwVGp3Q3NFLVo5MUowVWpoUXR5eUF0aWlXX1E=");
-    localStorage.setItem("portfolio2_gemini_key", savedKey);
-    const keyInput = document.getElementById("geminiApiKeyInput");
-    if (keyInput) keyInput.value = savedKey;
   </script>
 </body>
 </html>
