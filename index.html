@@ -1366,13 +1366,44 @@
     // 1. 사용자가 직접 첨부한 풍납초 이미지 원본 경로 그대로 적용
     window.PUNGNAP_LOGO_URL = "logo.png";
 
-    window.addEventListener("DOMContentLoaded", function() {
+    window.CONFIG = {
+      SCHOOL: "서울풍납초등학교",
+      AUTHOR: "교사 김규태",
+      LOGO_URL: window.PUNGNAP_LOGO_URL,
+      GITHUB_USER: "GT7-design",
+      REPO_NAME: "portfolio2",
+      DEPLOY_URL: "https://portfolio2-alpha-woad-59.vercel.app/",
+      ALLOWED_DOMAINS: ["gmail.com", "sen.go.kr", "school.kr", "edu.sen.go.kr"]
+    };
+    window.REPO_URL = `https://github.com/${window.CONFIG.GITHUB_USER}/${window.CONFIG.REPO_NAME}`;
+
+    window.setLogosAndLinks = function() {
       const l1 = document.getElementById("loginLogo");
       const l2 = document.getElementById("brandLogo");
       const l3 = document.getElementById("heroLogo");
-      if (l1) l1.src = window.PUNGNAP_LOGO_URL;
-      if (l2) l2.src = window.PUNGNAP_LOGO_URL;
-      if (l3) l3.src = window.PUNGNAP_LOGO_URL;
+      if (l1) l1.src = window.CONFIG.LOGO_URL;
+      if (l2) l2.src = window.CONFIG.LOGO_URL;
+      if (l3) l3.src = window.CONFIG.LOGO_URL;
+
+      const repoLink = document.getElementById("repoLink");
+      const deployLink = document.getElementById("deployLink");
+      const footerRepoLink = document.getElementById("footerRepoLink");
+
+      if (repoLink) {
+        repoLink.href = window.REPO_URL;
+        repoLink.textContent = window.REPO_URL;
+      }
+      if (deployLink) {
+        deployLink.href = window.CONFIG.DEPLOY_URL;
+        deployLink.textContent = window.CONFIG.DEPLOY_URL;
+      }
+      if (footerRepoLink) {
+        footerRepoLink.href = window.REPO_URL;
+      }
+    };
+
+    window.addEventListener("DOMContentLoaded", function() {
+      window.setLogosAndLinks();
     });
 
     // 2. 추천 주제 목록 및 전역 자동 입력 함수 (언제 어디서 클릭해도 100% 입력 보장)
@@ -1992,43 +2023,7 @@ Rules:
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    const CONFIG = {
-      SCHOOL: "서울풍납초등학교",
-      AUTHOR: "교사 김규태",
-      LOGO_URL: window.PUNGNAP_LOGO_URL || "logo.png",
-      GITHUB_USER: "GT7-design",
-      REPO_NAME: "portfolio2",
-      DEPLOY_URL: "https://portfolio2-alpha-woad-59.vercel.app/",
-      ALLOWED_DOMAINS: ["gmail.com", "sen.go.kr", "school.kr", "edu.sen.go.kr"]
-    };
-
-    const REPO_URL = `https://github.com/${CONFIG.GITHUB_USER}/${CONFIG.REPO_NAME}`;
-
-    // 기본 로고 및 링크 초기화
-    window.setLogosAndLinks = function() {
-      const l1 = document.getElementById("loginLogo");
-      const l2 = document.getElementById("brandLogo");
-      const l3 = document.getElementById("heroLogo");
-      if (l1) l1.src = CONFIG.LOGO_URL;
-      if (l2) l2.src = CONFIG.LOGO_URL;
-      if (l3) l3.src = CONFIG.LOGO_URL;
-
-      const repoLink = document.getElementById("repoLink");
-      const deployLink = document.getElementById("deployLink");
-      const footerRepoLink = document.getElementById("footerRepoLink");
-
-      if (repoLink) {
-        repoLink.href = REPO_URL;
-        repoLink.textContent = REPO_URL;
-      }
-      if (deployLink) {
-        deployLink.href = CONFIG.DEPLOY_URL;
-        deployLink.textContent = CONFIG.DEPLOY_URL;
-      }
-      if (footerRepoLink) {
-        footerRepoLink.href = REPO_URL;
-      }
-    };
+    // (CONFIG 및 setLogosAndLinks는 상단 전역 동기 스크립트로 분리 완료)
 
     // [2] Google 계정 로그인 (실제 구글 팝업 로그인 시도, 에러 발생 시 시연 계정으로 강제 전환하지 않음)
     window.firebaseLogin = async function() {
@@ -2037,7 +2032,7 @@ Rules:
         const email = result.user.email;
         const domain = email.split("@")[1].toLowerCase();
 
-        if (!CONFIG.ALLOWED_DOMAINS.includes(domain)) {
+        if (!window.CONFIG.ALLOWED_DOMAINS.includes(domain)) {
           alert("허용된 도메인(@sen.go.kr, @school.kr, @edu.sen.go.kr, @gmail.com) 계정으로만 접속 가능합니다.");
           await signOut(auth);
           return;
