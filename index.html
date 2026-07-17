@@ -1128,12 +1128,28 @@
         </div>
 
         <div class="field">
+          <label for="characterDetailInput">👗 등장인물 외모 및 의상 세부 설정 (GenToon식 캐릭터 일관성 제어)</label>
+          <input id="characterDetailInput" type="text" placeholder="예: 파란색 후드티에 청바지를 입은 갈색 머리 소년 (각 컷마다 인물 스타일 유지)">
+        </div>
+
+        <div class="field">
           <label for="genreInput">🏷️ 작품 장르 / 수업 교과</label>
           <select id="genreInput">
             <option value="역사 모험">🏛️ 역사 모험 (사회/지역화)</option>
             <option value="교육 판타지">✨ 교육 판타지 (창의적체험학습)</option>
             <option value="학교 일상">🏫 학교 일상 (국어/도덕)</option>
             <option value="환경 캠페인">🌿 환경 보호 캠페인 (과학/실과)</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="artStyleSelect">🎨 웹툰 예술 그림 스타일 프리셋 (GenToon식 스타일 설정)</label>
+          <select id="artStyleSelect">
+            <option value="modern-webtoon" selected>✨ 현대 한국 웹툰 스타일 (Modern Korean Webtoon)</option>
+            <option value="shonen-manga">📓 일본 소년 만화 스타일 (Japanese Shonen Manga - 흑백/스크린톤)</option>
+            <option value="retro-comic">🇺🇸 미국 레트로 카툰 스타일 (Classic Retro Comic Book - 팝아트)</option>
+            <option value="watercolor-illustration">🌸 감성 수채화 일러스트 스타일 (Emotional Watercolor Art)</option>
+            <option value="pixel-art">👾 레트로 도트 픽셀 아트 스타일 (8/16-bit Retro Pixel Game Art)</option>
           </select>
         </div>
 
@@ -1169,7 +1185,7 @@
               <label for="aiEngineSelect" style="font-size:12px; color:var(--text); margin-bottom:4px; display:block; font-weight:700;">✨ 생성 엔진 선택:</label>
               <select id="aiEngineSelect" style="width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--line); font-weight:700; color:var(--text); background:#fff;">
                 <option value="gemini-flash" selected>🚀 Google Gemini 2.0 Flash (스토리 분석 후 컷별 고품질 벡터 일러스트 생성)</option>
-                <option value="nanobanana">🍌 Google Nano Banana (Gemini 3.1 Image Preview) - 고품질 일러스트 생성 (API 키 필수)</option>
+                <option value="nanobanana">🍌 Google Nano Banana (Gemini 2.5 Flash Image) - 고품질 일러스트 생성 (API 키 필수)</option>
                 <option value="imagen3">🎨 Google Imagen 3 (`imagen-3.0-generate-002`) - 실사/웹툰 이미지 생성 (API 키 필수)</option>
                 <option value="pollinations">🌐 Pollinations AI Flux (API 키 없이 장면 영문 프롬프트 변환 고품질 렌더링)</option>
               </select>
@@ -1562,17 +1578,29 @@
       }
     }
 
-    // [7] 고품질 AI 일러스트 생성을 위한 영어 프롬프트 변환 로직
-    function getEnglishStyleTags(genre, characters, sceneText) {
-      let styleTag = "korean webtoon style, high quality anime illustration, vivid digital painting, detailed masterpiece";
-      if (genre.includes("역사")) {
-        styleTag = "korean webtoon style, historical adventure, traditional korean palace and costumes, cinematic lighting, masterpiece";
-      } else if (genre.includes("판타지")) {
-        styleTag = "anime fantasy illustration, korean webtoon style, magical atmosphere, glowing lights, vibrant colors, detailed art";
-      } else if (genre.includes("일상")) {
-        styleTag = "cheerful school slice of life anime illustration, korean webtoon style, bright cozy classroom, high detail";
-      } else if (genre.includes("환경")) {
-        styleTag = "korean webtoon style, eco friendly nature and hopeful green environment, bright anime illustration, digital art";
+    // [7] 고품질 AI 일러스트 생성을 위한 영어 프롬프트 변환 로직 (GenToon 스타일 프리셋 연동)
+    function getEnglishStyleTags(genre, characters, sceneText, artStyle = "modern-webtoon", characterDetail = "") {
+      let styleTag = "korean webtoon style, high quality digital anime illustration, clean lines, vibrant webtoon lighting, detailed masterpiece";
+      
+      if (artStyle === "shonen-manga") {
+        styleTag = "japanese shonen manga style, highly dynamic black and white comic page, dynamic ink lineart, halftone dots shading, masterpiece manga art";
+      } else if (artStyle === "retro-comic") {
+        styleTag = "retro classic american comic book style, bold outlines, pop art colors, vintage comic book ink shading, 1980s cartoon illustration";
+      } else if (artStyle === "watercolor-illustration") {
+        styleTag = "beautiful soft watercolor painting illustration, gentle hand-drawn ink lines, warm pastel color washes, watercolor texture background, masterpiece";
+      } else if (artStyle === "pixel-art") {
+        styleTag = "detailed 16-bit retro pixel art game screen, clean blocky pixel graphics, pixelated anime style illustration";
+      } else {
+        // modern-webtoon
+        if (genre.includes("역사")) {
+          styleTag = "korean webtoon style, historical adventure, traditional korean palace and costumes, cinematic lighting, masterpiece";
+        } else if (genre.includes("판타지")) {
+          styleTag = "anime fantasy illustration, korean webtoon style, magical atmosphere, glowing lights, vibrant colors, detailed art";
+        } else if (genre.includes("일상")) {
+          styleTag = "cheerful school slice of life anime illustration, korean webtoon style, bright cozy classroom, high detail";
+        } else if (genre.includes("환경")) {
+          styleTag = "korean webtoon style, eco friendly nature and hopeful green environment, bright anime illustration, digital art";
+        }
       }
 
       const keywords = [];
@@ -1592,11 +1620,12 @@
       if (/지구|자랑|변화|실천/.test(sceneText)) keywords.push("clean green school building under bright blue sky and earth graphic");
 
       const actionPrompt = keywords.length > 0 ? keywords.join(", ") : sceneText.replace(/[^\w\s]/g, " ").trim();
-      return `${styleTag}, scene of ${characters}, ${actionPrompt}`;
+      const characterPart = characterDetail ? `${characters} (${characterDetail})` : characters;
+      return `${styleTag}, scene of ${characterPart}, ${actionPrompt}`;
     }
 
-    // [8] gentoon.ai 스타일: 모든 컷이 프롬프트/주제/캐릭터를 생생하게 반영하는 고품질 맞춤 웹툰 일러스트 SVG 렌더러
-    function generateMeaningfulSceneArt(index, sceneText, genre, characters) {
+    // [8] gentoon.ai 스타일: 모든 컷이 프롬프트/주제/캐릭터/그림체를 생생하게 반영하는 고품질 맞춤 웹툰 일러스트 SVG 렌더러
+    function generateMeaningfulSceneArt(index, sceneText, genre, characters, artStyle = "modern-webtoon", characterDetail = "") {
       const palettes = [
         ["#1e1b4b", "#4c1d95", "#fbbf24", "✨ 빛나는 옥구슬과 시간 여행"],
         ["#381804", "#9a3412", "#fde047", "🏛️ 1,700년 전 백제 왕성 풍납토성"],
@@ -1607,7 +1636,18 @@
         ["#0f172a", "#334155", "#e2e8f0", "⏳ 과거와 현대가 어우러지는 기적의 현장"],
         ["#500724", "#be123c", "#fecdd3", "🌟 살아 숨 쉬는 풍납초 AI 웹툰 이야기"]
       ];
-      const [bgDark, bgMain, accent, defaultTheme] = palettes[index % palettes.length];
+      let [bgDark, bgMain, accent, defaultTheme] = palettes[index % palettes.length];
+
+      if (artStyle === "shonen-manga") {
+        bgDark = "#111827"; bgMain = "#374151"; accent = "#cbd5e1"; defaultTheme = defaultTheme + " (📓 소년만화)";
+      } else if (artStyle === "retro-comic") {
+        bgDark = "#1e3a8a"; bgMain = "#b91c1c"; accent = "#facc15"; defaultTheme = defaultTheme + " (🇺🇸 레트로카툰)";
+      } else if (artStyle === "watercolor-illustration") {
+        bgDark = "#fafaf9"; bgMain = "#f5f5f4"; accent = "#f472b6"; defaultTheme = defaultTheme + " (🌸 감성수채화)";
+      } else if (artStyle === "pixel-art") {
+        bgDark = "#0f172a"; bgMain = "#06b6d4"; accent = "#a855f7"; defaultTheme = defaultTheme + " (👾 픽셀아트)";
+      }
+
       const safeText = shorten(sceneText.replace(/[<>&"]/g, ""), 55);
 
       let scenery = "";
@@ -1707,6 +1747,22 @@
                            <circle cx="300" cy="160" r="18" fill="#fbbf24" opacity="0.9" filter="url(#glow_${index})"/>`;
       }
 
+      let extraDefs = "";
+      let extraOverlays = "";
+      if (artStyle === "shonen-manga") {
+        extraDefs = `
+          <pattern id="screentone_${index}" width="8" height="8" patternUnits="userSpaceOnUse">
+            <circle cx="2" cy="2" r="1.5" fill="#ffffff" opacity="0.15"/>
+          </pattern>`;
+        extraOverlays = `<rect width="600" height="450" fill="url(#screentone_${index})" pointer-events="none"/>`;
+      } else if (artStyle === "pixel-art") {
+        extraDefs = `
+          <pattern id="pixelgrid_${index}" width="16" height="16" patternUnits="userSpaceOnUse">
+            <rect width="16" height="16" fill="none" stroke="#ffffff" stroke-width="0.5" opacity="0.08"/>
+          </pattern>`;
+        extraOverlays = `<rect width="600" height="450" fill="url(#pixelgrid_${index})" pointer-events="none"/>`;
+      }
+
       const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="450" viewBox="0 0 600 450">
         <defs>
           <linearGradient id="grad_${index}" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -1721,6 +1777,7 @@
             <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
             <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
           </filter>
+          ${extraDefs}
         </defs>
         <rect width="600" height="450" fill="url(#grad_${index})" />
         <circle cx="90" cy="70" r="3" fill="#fff" opacity="0.4"/>
@@ -1730,10 +1787,11 @@
         ${atmosphere}
         ${scenery}
         ${characterShapes}
+        ${extraOverlays}
         <rect x="25" y="315" width="550" height="115" rx="16" fill="rgba(255, 255, 255, 0.96)" stroke="${accent}" stroke-width="2.5"/>
         <text x="300" y="348" font-size="16" text-anchor="middle" fill="${bgDark}" font-weight="900" font-family="sans-serif">🎨 [제 ${index + 1}장 · ${genre}] ${defaultTheme}</text>
         <text x="300" y="378" font-size="14.5" text-anchor="middle" fill="#1e293b" font-weight="700" font-family="sans-serif">${safeText}</text>
-        <text x="300" y="406" font-size="12" text-anchor="middle" fill="#64748b" font-family="sans-serif">👥 등장인물: ${shorten(characters, 35)}</text>
+        <text x="300" y="406" font-size="12" text-anchor="middle" fill="#64748b" font-family="sans-serif">👥 등장인물: ${shorten(characters, 35)} ${characterDetail ? '(' + shorten(characterDetail, 15) + ')' : ''}</text>
       </svg>`;
       return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
     }
@@ -1748,7 +1806,9 @@
     window.generateWebtoon = async function() {
       const title = document.getElementById("titleInput").value.trim();
       const characters = document.getElementById("charactersInput").value.trim();
+      const characterDetail = document.getElementById("characterDetailInput")?.value?.trim() || "";
       const genre = document.getElementById("genreInput").value;
+      const artStyle = document.getElementById("artStyleSelect")?.value || "modern-webtoon";
       const cuts = Number(document.getElementById("cutsInput").value);
       const story = document.getElementById("storyInput").value.trim();
 
@@ -1775,7 +1835,7 @@
             <div class="toon-body">
               <h4>${idx + 1}컷 · ${shorten(scene, 18)}</h4>
               <p><strong>📜 이야기 내용</strong><br>${scene}</p>
-              <div class="prompt-box">💬 <strong>AI 연출 키워드:</strong> ${genre}, ${characters}, ${shorten(scene, 40)}</div>
+              <div class="prompt-box">💬 <strong>AI 연출 키워드:</strong> ${genre} (${artStyle}), ${characters} ${characterDetail ? '[' + characterDetail + ']' : ''}, ${shorten(scene, 40)}</div>
             </div>
           </div>
         `).join("");
@@ -1817,7 +1877,7 @@
 
         const englishScene = await translateToEnglish(sceneText);
         const englishChars = await translateToEnglish(characters);
-        const promptTags = getEnglishStyleTags(genre, englishChars, englishScene);
+        const promptTags = getEnglishStyleTags(genre, englishChars, englishScene, artStyle, characterDetail);
         const seed = Date.now() + idx * 777 + Math.floor(Math.random() * 1000);
 
         if (aiEngine === "gemini-flash" && apiKey) {
@@ -1831,7 +1891,9 @@
                   parts: [{
                     text: `You are an expert webtoon artist. Create a beautiful, full-color, highly expressive custom SVG illustration for Scene #${idx + 1} of a Korean webtoon.
 Genre: ${genre}
+Art Style Preset: ${artStyle} (Draw it in this style: shonen-manga means black/white/gray shades with halftone screen dots, retro-comic means bold outlines and bright retro colors, watercolor-illustration means pastel colors with soft paint washes, pixel-art means blocky pixels, modern-webtoon means modern vibrant gradients)
 Main Characters: ${characters}
+Character Outfit/Appearance: ${characterDetail}
 Specific Scene Story: "${sceneText}"
 
 Rules:
@@ -1902,7 +1964,7 @@ Rules:
         }
 
         const aiUrlPrimary = `https://image.pollinations.ai/prompt/${encodeURIComponent(promptTags)}?width=600&height=450&nologo=true&seed=${seed}`;
-        const fallbackArt = generateMeaningfulSceneArt(idx, sceneText, genre, characters);
+        const fallbackArt = generateMeaningfulSceneArt(idx, sceneText, genre, characters, artStyle, characterDetail);
 
         // 외부 렌더러가 4초 내 응답하지 않거나 에러 시 즉시 gentoon.ai 스타일 맞춤 웹툰 일러스트로 100% 즉시 렌더링
         let imgUrl = await tryFetchImage(aiUrlPrimary, 4000);
@@ -1929,7 +1991,7 @@ Rules:
           finishScene(idx, imgUrl, sceneText);
         } catch (e) {
           console.warn(`[${idx + 1}컷] 이미지 생성 에러, fallback 사용:`, e);
-          finishScene(idx, generateMeaningfulSceneArt(idx, sceneText, genre, characters), sceneText);
+          finishScene(idx, generateMeaningfulSceneArt(idx, sceneText, genre, characters, artStyle, characterDetail), sceneText);
         }
       }));
 
@@ -1942,7 +2004,7 @@ Rules:
       const userEmail = window.currentActiveUser?.email || "demo@school.kr";
 
       window.currentWebtoonData = {
-        title, characters, genre, cuts,
+        title, characters, characterDetail, genre, artStyle, cuts,
         createdAtStr, createdBy: userEmail,
         scenes: generatedScenes
       };
@@ -2090,6 +2152,40 @@ Rules:
         return;
       }
       window.currentWebtoonData = item;
+      
+      // 입력 폼 필드 상태 복구
+      if (item.title) {
+        const tInput = document.getElementById("titleInput");
+        if (tInput) tInput.value = item.title;
+      }
+      if (item.characters) {
+        const cInput = document.getElementById("charactersInput");
+        if (cInput) cInput.value = item.characters;
+      }
+      if (item.characterDetail) {
+        const cdInput = document.getElementById("characterDetailInput");
+        if (cdInput) cdInput.value = item.characterDetail;
+      } else {
+        const cdInput = document.getElementById("characterDetailInput");
+        if (cdInput) cdInput.value = "";
+      }
+      if (item.genre) {
+        const gInput = document.getElementById("genreInput");
+        if (gInput) gInput.value = item.genre;
+      }
+      if (item.artStyle) {
+        const asSelect = document.getElementById("artStyleSelect");
+        if (asSelect) asSelect.value = item.artStyle;
+      }
+      if (item.cuts) {
+        const cutsSelect = document.getElementById("cutsInput");
+        if (cutsSelect) cutsSelect.value = item.cuts;
+      }
+      if (item.story) {
+        const sTextarea = document.getElementById("storyInput");
+        if (sTextarea) sTextarea.value = item.story;
+      }
+
       window.renderPanelGrid(item.scenes, item.genre, item.characters);
       const bookAction = document.getElementById("bookViewAction");
       if (bookAction) bookAction.style.display = "block";
@@ -2107,6 +2203,9 @@ Rules:
     window.renderPanelGrid = function(scenesData, genre, characters) {
       const panelGrid = document.getElementById("panelGrid");
       if (!panelGrid) return;
+      const item = window.currentWebtoonData || {};
+      const artStyle = item.artStyle || "modern-webtoon";
+      const characterDetail = item.characterDetail || "";
       panelGrid.innerHTML = scenesData.map((data, idx) => `
         <div class="toon-panel">
           <div class="toon-visual">
@@ -2116,7 +2215,7 @@ Rules:
           <div class="toon-body">
             <h4>${idx + 1}컷 · ${shorten(data.text, 18)}</h4>
             <p><strong>📜 이야기 내용</strong><br>${data.text}</p>
-            <div class="prompt-box">💬 <strong>AI 연출 키워드:</strong> ${genre}, ${characters}, ${shorten(data.text, 40)}</div>
+            <div class="prompt-box">💬 <strong>AI 연출 키워드:</strong> ${genre} (${artStyle}), ${characters} ${characterDetail ? '[' + characterDetail + ']' : ''}, ${shorten(data.text, 40)}</div>
           </div>
         </div>
       `).join("");
