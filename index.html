@@ -1167,36 +1167,7 @@
           <textarea id="storyInput" placeholder="예: 풍납토성 현장체험학습을 간 민준이는 안내판 옆에서 이상하게 빛나는 구슬을 발견했다. 구슬을 만지는 순간 신비한 빛과 함께 백제 왕성 시절로 시간 이동을 하게 되었다. 그곳에서 또래의 백제 소년 서동을 만나 왕성의 시장과 흙 성벽을 쌓는 사람들을 보며 당시 생활 모습을 배우게 된다. 민준이는 원래 시대로 돌아올 방법을 찾으면서 백제 친구들과 소중한 추억을 나눈다..."></textarea>
         </div>
 
-        <!-- 🤖 AI 일러스트 생성 엔진 (Gemini AI 연동 및 프롬프트 반영 렌더러 설정) -->
-        <div class="field" style="background: linear-gradient(135deg, rgba(124,58,237,0.06), rgba(59,130,246,0.06)); padding: 18px; border-radius: 16px; border: 1.5px solid rgba(124,58,237,0.3); margin-top: 8px; margin-bottom: 20px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
-            <label style="margin:0; color:var(--primary-dark); font-size:15px; font-weight:800; display:flex; align-items:center; gap:6px;">
-              🤖 AI 일러스트 생성 엔진 (Gemini AI 연동)
-            </label>
-            <a href="https://aistudio.google.com/app/apikey" target="_blank" style="background:#fff; color:var(--primary); padding:6px 12px; font-size:12px; border:1px solid var(--primary-light); border-radius:8px; text-decoration:none; font-weight:700; box-shadow:0 2px 6px rgba(0,0,0,0.05);">
-              🔑 Google Gemini 무료 API 키 발급 ↗
-            </a>
-          </div>
-          <p style="font-size:13px; color:var(--muted); margin-bottom:12px; line-height:1.5;">
-            모든 컷이 서로 다른 <strong>프롬프트 반영 맞춤형 일러스트</strong>를 생성합니다. Gemini API 키를 입력하시면 <strong>Gemini 2.5 Flash / Imagen 3</strong>가 스토리 텍스트를 분석하여 각 장면에 알맞은 작품을 직접 렌더링합니다.
-          </p>
-          <div style="display:grid; grid-template-columns: 1fr; gap:12px;">
-            <div>
-              <label for="aiEngineSelect" style="font-size:12px; color:var(--text); margin-bottom:4px; display:block; font-weight:700;">✨ 생성 엔진 선택:</label>
-              <select id="aiEngineSelect" style="width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--line); font-weight:700; color:var(--text); background:#fff;">
-                <option value="gemini-3-pro-image" selected>🌟 Google Gemini 3 Pro Image (초고품질 웹툰 일러스트 생성 - API 키 필수)</option>
-                <option value="gemini-flash">🚀 Google Gemini 2.0 Flash (스토리 분석 후 컷별 고품질 벡터 일러스트 생성)</option>
-                <option value="nanobanana">🍌 Google Nano Banana (Gemini 2.5 Flash Image) - 고품질 일러스트 생성 (API 키 필수)</option>
-                <option value="imagen3">🎨 Google Imagen 3 (`imagen-3.0-generate-002`) - 실사/웹툰 이미지 생성 (API 키 필수)</option>
-                <option value="pollinations">🌐 Pollinations AI Flux (API 키 없이 장면 영문 프롬프트 변환 고품질 렌더링)</option>
-              </select>
-            </div>
-            <div>
-              <label for="geminiApiKeyInput" style="font-size:12px; color:var(--text); margin-bottom:4px; display:block; font-weight:700;">🔑 Google Gemini API 키 (자동 적용 완료):</label>
-              <input type="password" id="geminiApiKeyInput" placeholder="AIzaSy... (입력 시 바로 Gemini API 연동)" onchange="saveGeminiKey(this.value)" style="width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--line); font-family:monospace; font-size:13px;">
-            </div>
-          </div>
-        </div>
+
 
         <button class="btn btn-primary" style="width:100%; padding:16px; font-size:16px;" onclick="generateWebtoon()">
           <span>⚡ AI 웹툰 컷 및 일러스트 생성하기</span>
@@ -1873,8 +1844,8 @@
       };
 
       async function generateCutImage(sceneText, idx) {
-        const aiEngine = document.getElementById("aiEngineSelect")?.value || "gemini-flash";
-        const apiKey = document.getElementById("geminiApiKeyInput")?.value?.trim() || localStorage.getItem("portfolio2_gemini_key") || atob("QVEuQWI4Uk42S0Y4aGV3bGVlemk2NWNCWkVwVGp3Q3NFLVo5MUowVWpoUXR5eUF0aWlXX1E=");
+        const aiEngine = "gemini-3-pro-image";
+        const apiKey = atob("QVEuQWI4Uk42S0pGUjFGbmFpMEJqakFKNlI2RkN4SExoWlJ3eVRBb3V4ay1ET29uOUhab1E=");
 
         const englishScene = await translateToEnglish(sceneText);
         const englishChars = await translateToEnglish(characters);
