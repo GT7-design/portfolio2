@@ -378,6 +378,138 @@
       .brand h2{font-size:24px}
       .hero h3{font-size:28px}
     }
+
+    /* Footer Styles */
+    .app-footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .footer-links {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .footer-links a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .footer-links a:hover {
+      text-decoration: underline;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+    }
+    .modal-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    .modal-content {
+      background: #fff;
+      border-radius: 24px;
+      width: min(600px, 100%);
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 24px 48px rgba(0,0,0,0.1);
+      transform: translateY(20px);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .modal-overlay.show .modal-content {
+      transform: translateY(0);
+    }
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #faf7ff;
+    }
+    .modal-header h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 800;
+    }
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--muted);
+      padding: 0;
+      line-height: 1;
+    }
+    .modal-body {
+      padding: 24px;
+      overflow-y: auto;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+    .modal-body h4 {
+      margin: 20px 0 8px;
+      color: var(--primary);
+    }
+    .modal-body ul {
+      padding-left: 20px;
+      margin-top: 8px;
+    }
+    
+    /* Book View Styles */
+    .book-modal-content {
+      width: min(800px, 100%);
+      background: #fdfcff;
+    }
+    .book-viewer {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      align-items: center;
+    }
+    .book-page {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      overflow: hidden;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .book-image {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      display: block;
+      background: #f1f5f9;
+    }
+    .book-text {
+      padding: 20px;
+      font-size: 15px;
+      line-height: 1.7;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -503,8 +635,95 @@
       <div class="card" style="padding:18px;">
         <div class="section-title">생성 결과</div>
         <div id="panelGrid" class="panel-grid"></div>
+        <div id="bookViewAction" style="margin-top:20px; text-align:center; display:none;">
+          <button class="btn btn-primary" onclick="openBookView()">📖 책 형태로 보기</button>
+        </div>
       </div>
     </section>
+
+    <footer class="app-footer">
+      <div class="footer-links">
+        <a onclick="openModal('privacyModal')">개인정보처리방침</a>
+        <a onclick="openModal('termsModal')">사용약관</a>
+        <a onclick="openModal('guideModal')">사용방법 안내</a>
+      </div>
+      <div>소속: 서울풍납초등학교 | 이름: 김규태</div>
+    </footer>
+  </div>
+
+  <!-- Modals -->
+  <div id="privacyModal" class="modal-overlay" onclick="handleModalClick(event, 'privacyModal')">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>개인정보처리방침</h3>
+        <button class="close-btn" onclick="closeModal('privacyModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h4>수집 항목</h4>
+        <p>Google 계정 이메일 주소, 이름 (또는 시연용 임시 데이터)</p>
+        <h4>이용 목적</h4>
+        <p>교직원 및 학생 신원 확인, 웹툰 생성 기록 관리 및 서비스 제공</p>
+        <h4>보관 기간</h4>
+        <p>서비스 이용 종료 시 또는 회원 탈퇴 시까지 (웹툰 기록은 최대 1년 보관 후 파기)</p>
+        <h4>문의처</h4>
+        <p>서울풍납초등학교 김규태 교사 (이메일: example@sen.go.kr)</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="termsModal" class="modal-overlay" onclick="handleModalClick(event, 'termsModal')">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>사용약관</h3>
+        <button class="close-btn" onclick="closeModal('termsModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h4>서비스 이용 조건</h4>
+        <p>본 서비스는 교육 목적으로 제공되며, 허용된 도메인의 계정으로만 이용이 가능합니다. (시연용 예외)</p>
+        <h4>책임 범위</h4>
+        <p>생성된 웹툰의 내용 및 저작권에 대한 책임은 생성한 사용자에게 있습니다. AI가 생성한 이미지나 텍스트의 완벽성을 보장하지 않습니다.</p>
+        <h4>금지 행위</h4>
+        <p>불법적인 콘텐츠 생성, 타인의 명예훼손, 개인정보 유출 등을 목적으로 하는 사용을 엄격히 금지합니다.</p>
+        <h4>변경 안내</h4>
+        <p>서비스의 기능이나 약관이 변경될 경우, 본 페이지를 통해 사전 공지합니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="guideModal" class="modal-overlay" onclick="handleModalClick(event, 'guideModal')">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>사용방법 안내</h3>
+        <button class="close-btn" onclick="closeModal('guideModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h4>로그인</h4>
+        <p>'Google 계정으로 인증' 버튼을 눌러 학교 계정으로 로그인하거나, '시연용 계정 자동 입력'을 통해 테스트해 볼 수 있습니다.</p>
+        <h4>주요 기능</h4>
+        <ul>
+          <li><strong>작품 정보 입력:</strong> 제목, 등장인물, 장르를 설정합니다.</li>
+          <li><strong>상세 스토리 입력:</strong> 구체적인 이야기의 흐름과 감정을 자세하게 적습니다.</li>
+          <li><strong>웹툰 컷 생성:</strong> 4/8/12컷 중 원하는 길이를 선택하고 생성 버튼을 누르면 AI가 장면을 분할하여 이미지 프롬프트를 만듭니다.</li>
+          <li><strong>책 형태로 보기:</strong> 완성된 웹툰을 한 권의 책처럼 스크롤하여 감상할 수 있습니다.</li>
+        </ul>
+        <h4>주의사항</h4>
+        <p>입력한 스토리가 길고 상세할수록 더 좋은 품질의 장면과 이미지를 얻을 수 있습니다. 부적절한 단어 사용 시 생성이 제한될 수 있습니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="bookModal" class="modal-overlay" onclick="handleModalClick(event, 'bookModal')">
+    <div class="modal-content book-modal-content">
+      <div class="modal-header">
+        <h3 id="bookModalTitle">웹툰 작품 보기</h3>
+        <button class="close-btn" onclick="closeModal('bookModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="bookViewer" class="book-viewer">
+          <!-- 책 내용이 여기에 생성됩니다 -->
+        </div>
+      </div>
+    </div>
   </div>
 
   <script type="module">
@@ -555,7 +774,14 @@
     }
 
     window.fillDemo = function(){
-      alert("Firebase 인증에서는 'Google 계정으로 인증' 버튼을 눌러 실제 구글 계정으로 로그인해야 합니다.");
+      // 데모 계정으로 강제 접속 처리
+      openApp("demo@school.kr");
+      
+      // 시연용이므로 Firestore 연동 에러 방지를 위해 히스토리 로드 우회
+      const ul = document.getElementById("historyList");
+      if(ul) {
+        ul.innerHTML = "<li>시연용 계정으로 접속 중입니다. (기록은 저장되지 않습니다.)</li>";
+      }
     };
 
     window.login = async function(){
@@ -658,19 +884,32 @@
 
       const scenes = splitIntoScenes(story, cuts);
       const panelGrid = document.getElementById("panelGrid");
+      
+      // 임시로 글로벌에 저장하여 '책 형태로 보기'에서 사용
+      window.currentWebtoonData = {
+        title,
+        scenes: scenes.map((scene, index) => ({
+          text: scene,
+          // 난수를 이용해 매번, 그리고 각 컷마다 다른 이미지를 가져오도록 함
+          imgUrl: `https://picsum.photos/seed/${Math.random().toString(36).substring(7)}/600/450`
+        }))
+      };
 
-      panelGrid.innerHTML = scenes.map((scene, index) => `
+      panelGrid.innerHTML = window.currentWebtoonData.scenes.map((data, index) => `
         <div class="toon-panel">
-          <div class="toon-visual">
-            <div class="toon-number">${index + 1}</div>
+          <div class="toon-visual" style="padding:0; background:none;">
+            <img src="${data.imgUrl}" alt="Scene ${index+1}" style="width:100%; height:100%; object-fit:cover; display:block;">
+            <div class="toon-number" style="position:absolute; top:14px; left:14px; z-index:2;">${index + 1}</div>
           </div>
           <div class="toon-body">
-            <h4>${index + 1}컷 · ${shorten(scene, 18)}</h4>
-            <p><strong>간단한 이야기 내용</strong><br>${scene}</p>
-            <p><strong>이미지 프롬프트</strong><br>${makePrompt(genre, characters, shorten(scene, 80))}</p>
+            <h4>${index + 1}컷 · ${shorten(data.text, 18)}</h4>
+            <p><strong>간단한 이야기 내용</strong><br>${data.text}</p>
+            <p><strong>이미지 프롬프트</strong><br>${makePrompt(genre, characters, shorten(data.text, 80))}</p>
           </div>
         </div>
       `).join("");
+      
+      document.getElementById("bookViewAction").style.display = "block";
 
       try {
         const now = new Date();
@@ -707,6 +946,40 @@
         </li>
       `).join("");
     }
+
+    // Modal Control
+    window.openModal = function(id) {
+      document.getElementById(id).classList.add('show');
+    };
+    
+    window.closeModal = function(id) {
+      document.getElementById(id).classList.remove('show');
+    };
+    
+    window.handleModalClick = function(event, id) {
+      if (event.target.id === id) {
+        closeModal(id);
+      }
+    };
+    
+    window.openBookView = function() {
+      if (!window.currentWebtoonData) return;
+      
+      document.getElementById("bookModalTitle").textContent = window.currentWebtoonData.title;
+      const viewer = document.getElementById("bookViewer");
+      
+      viewer.innerHTML = window.currentWebtoonData.scenes.map((data, index) => `
+        <div class="book-page">
+          <img class="book-image" src="${data.imgUrl}" alt="Scene ${index + 1}">
+          <div class="book-text">
+            <strong>제 ${index + 1}장</strong><br>
+            ${data.text}
+          </div>
+        </div>
+      `).join("");
+      
+      openModal('bookModal');
+    };
 
     setLogos();
     setLinks();
