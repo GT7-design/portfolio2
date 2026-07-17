@@ -5,422 +5,617 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>서울풍납초등학교 AI 웹툰 창작소</title>
   <style>
-    :root{
-      --primary:#7c3aed;
-      --primary-2:#8b5cf6;
-      --accent:#2563eb;
-      --bg:#faf7ff;
-      --card:#ffffff;
-      --line:#e7dcff;
-      --text:#111827;
-      --muted:#64748b;
+    :root {
+      --primary: #7c3aed;
+      --primary-2: #8b5cf6;
+      --primary-dark: #5b21b6;
+      --accent: #2563eb;
+      --accent-2: #3b82f6;
+      --bg: #faf7ff;
+      --card: rgba(255, 255, 255, 0.94);
+      --line: #e7dcff;
+      --line-dark: #d8c7ff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --shadow: 0 16px 36px rgba(124, 58, 237, 0.08);
+      --shadow-lg: 0 24px 48px rgba(124, 58, 237, 0.14);
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
-      color:var(--text);
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      color: var(--text);
       background:
-        radial-gradient(circle at 14% 8%, rgba(124,58,237,.16), transparent 24%),
-        radial-gradient(circle at 90% 0%, rgba(37,99,235,.12), transparent 22%),
-        linear-gradient(180deg, #fcfaff 0%, #f5f0ff 50%, #ffffff 100%);
-      min-height:100vh;
-      position:relative;
-      overflow-x:hidden;
+        radial-gradient(circle at 14% 8%, rgba(124, 58, 237, 0.15), transparent 28%),
+        radial-gradient(circle at 90% 12%, rgba(37, 99, 235, 0.12), transparent 26%),
+        linear-gradient(180deg, #fcfaff 0%, #f4efff 50%, #ffffff 100%);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
     }
-    body::before{
-      content:"";
-      position:fixed;
-      inset:0;
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
       background-image:
-        linear-gradient(rgba(124,58,237,.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(124,58,237,.05) 1px, transparent 1px);
-      background-size:34px 34px;
-      pointer-events:none;
-      mask-image:linear-gradient(to bottom, rgba(0,0,0,.9), rgba(0,0,0,.25));
+        linear-gradient(rgba(124, 58, 237, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(124, 58, 237, 0.04) 1px, transparent 1px);
+      background-size: 36px 36px;
+      pointer-events: none;
+      z-index: 0;
     }
-    .hidden{display:none !important}
-    .login-wrap{
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:24px;
+    .hidden { display: none !important; }
+    
+    /* Login Screen */
+    .login-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+      z-index: 1;
     }
-    .login-card,.card{
-      background:rgba(255,255,255,.9);
-      border:1px solid var(--line);
-      border-radius:28px;
-      backdrop-filter:blur(10px);
-      box-shadow:0 20px 50px rgba(124,58,237,.08);
+    .login-card {
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid var(--line-dark);
+      border-radius: 32px;
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow-lg);
+      width: min(600px, 100%);
+      padding: 40px 36px;
+      position: relative;
+      overflow: hidden;
     }
-    .login-card{
-      width:min(560px,100%);
-      padding:34px;
-      position:relative;
-      overflow:hidden;
+    .login-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary-2));
     }
-    .login-card::after{
-      content:"";
-      position:absolute;
-      left:-40px;
-      bottom:-40px;
-      width:180px;
-      height:180px;
-      background:radial-gradient(circle, rgba(37,99,235,.14), transparent 70%);
+    .logo {
+      width: 96px;
+      height: 96px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto 16px;
+      border-radius: 26px;
+      background: #fff;
+      border: 1px solid var(--line);
+      padding: 8px;
+      box-shadow: 0 8px 20px rgba(124, 58, 237, 0.08);
     }
-    .logo{
-      width:96px;
-      height:96px;
-      object-fit:contain;
-      display:block;
-      margin:0 auto 14px;
-      border-radius:24px;
-      background:#fff;
-      border:1px solid #ede5ff;
-      padding:8px;
+    .center { display: flex; justify-content: center; }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: #f3e8ff;
+      color: var(--primary-dark);
+      font-weight: 800;
+      font-size: 13px;
+      border: 1px solid #e9d5ff;
+      margin-bottom: 18px;
     }
-    .center{display:flex;justify-content:center}
-    .chip{
-      display:inline-flex;
-      padding:8px 12px;
-      border-radius:999px;
-      background:#f4ebff;
-      color:var(--primary);
-      font-weight:800;
-      font-size:13px;
-      border:1px solid #eadcff;
-      margin-bottom:16px;
+    .login-title {
+      text-align: center;
+      font-size: 32px;
+      font-weight: 900;
+      margin-bottom: 10px;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, var(--primary-dark), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
-    .login-title{
-      text-align:center;
-      font-size:30px;
-      font-weight:900;
-      margin-bottom:8px;
-      letter-spacing:-.03em;
+    .login-sub {
+      text-align: center;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 28px;
+      font-size: 15px;
     }
-    .login-sub{
-      text-align:center;
-      color:var(--muted);
-      line-height:1.7;
-      margin-bottom:24px;
+    .login-sub strong { color: var(--primary-dark); }
+    .field { margin-bottom: 16px; }
+    .field label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
     }
-    .field{margin-bottom:12px}
-    .field label{
-      display:block;
-      margin-bottom:6px;
-      font-size:14px;
-      font-weight:700;
+    input, select, textarea, button { font: inherit; }
+    input, select, textarea {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1.5px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+      color: var(--text);
+      transition: all 0.2s ease;
     }
-    input,select,textarea,button{font:inherit}
-    input,select,textarea{
-      width:100%;
-      padding:13px 14px;
-      border:1px solid var(--line);
-      border-radius:14px;
-      background:#fff;
-      color:var(--text);
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12);
     }
-    textarea{
-      min-height:220px;
-      resize:vertical;
-      line-height:1.7;
+    textarea {
+      min-height: 200px;
+      resize: vertical;
+      line-height: 1.7;
     }
-    .btn{
-      border:0;
-      border-radius:14px;
-      padding:13px 16px;
-      cursor:pointer;
-      font-weight:800;
-      transition:.2s ease;
+    .btn {
+      border: 0;
+      border-radius: 16px;
+      padding: 14px 18px;
+      cursor: pointer;
+      font-weight: 800;
+      font-size: 15px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
-    .btn:hover{transform:translateY(-1px)}
-    .btn-primary{
-      background:linear-gradient(135deg,var(--primary),var(--primary-2));
-      color:#fff;
+    .btn:hover { transform: translateY(-2px); }
+    .btn:active { transform: translateY(0); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(124, 58, 237, 0.25);
     }
-    .btn-light{
-      background:#faf5ff;
-      color:var(--primary);
-      border:1px solid #eadcff;
+    .btn-primary:hover {
+      box-shadow: 0 12px 28px rgba(124, 58, 237, 0.35);
     }
-    .login-actions{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
+    .btn-accent {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
     }
-    .notice{
-      margin-top:14px;
-      padding:12px 14px;
-      border-radius:14px;
-      background:#faf7ff;
-      border:1px solid #efe4ff;
-      color:#475569;
-      font-size:13px;
-      line-height:1.6;
+    .btn-accent:hover {
+      box-shadow: 0 12px 28px rgba(37, 99, 235, 0.35);
+    }
+    .btn-light {
+      background: #faf5ff;
+      color: var(--primary-dark);
+      border: 1px solid #eadcff;
+    }
+    .btn-light:hover {
+      background: #f3e8ff;
+      border-color: #d8c7ff;
+    }
+    .login-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .login-footer-links {
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px dashed var(--line);
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .login-footer-links a {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .login-footer-links a:hover {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+    .notice {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: #f8f5ff;
+      border: 1px solid #efe4ff;
+      color: #475569;
+      font-size: 13px;
+      line-height: 1.6;
     }
 
-    .app{
-      max-width:1320px;
-      margin:0 auto;
-      padding:24px 18px 40px;
+    /* App Screen */
+    .app {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 28px 20px 60px;
+      position: relative;
+      z-index: 1;
     }
-    .topbar{
-      display:flex;
-      justify-content:space-between;
-      gap:16px;
-      align-items:center;
-      flex-wrap:wrap;
-      margin-bottom:18px;
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+      background: rgba(255, 255, 255, 0.88);
+      padding: 18px 24px;
+      border-radius: 24px;
+      border: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
     }
-    .brand{
-      display:flex;
-      gap:14px;
-      align-items:center;
+    .brand {
+      display: flex;
+      gap: 16px;
+      align-items: center;
     }
-    .brand-logo{
-      width:76px;
-      height:76px;
-      object-fit:contain;
-      background:#fff;
-      border:1px solid var(--line);
-      border-radius:20px;
-      padding:6px;
+    .brand-logo {
+      width: 68px;
+      height: 68px;
+      object-fit: contain;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 6px;
     }
-    .brand h2{
-      font-size:28px;
-      font-weight:900;
-      letter-spacing:-.02em;
-      margin:0 0 5px;
+    .brand h2 {
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      margin: 0 0 6px;
+      background: linear-gradient(135deg, var(--primary-dark), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
-    .brand p{
-      margin:0;
-      color:#475569;
-      line-height:1.55;
-      font-size:14px;
+    .brand p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 14px;
     }
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      background:#fff;
-      border:1px solid var(--line);
-      padding:10px 12px;
-      border-radius:999px;
-      font-size:13px;
-      font-weight:700;
-      color:#334155;
+    .brand p strong { color: var(--primary-dark); }
+    .topbar-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
     }
-    .hero{
-      background:rgba(255,255,255,.88);
-      border:1px solid var(--line);
-      border-radius:28px;
-      padding:26px;
-      margin-bottom:18px;
-      position:relative;
-      overflow:hidden;
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #f3e8ff;
+      border: 1px solid #e9d5ff;
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--primary-dark);
     }
-    .hero::before{
-      content:"";
-      position:absolute;
-      right:-60px;
-      top:-60px;
-      width:260px;
-      height:260px;
-      border-radius:50%;
-      background:radial-gradient(circle, rgba(124,58,237,.16), transparent 70%);
+
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(248,245,255,0.95));
+      border: 1px solid var(--line-dark);
+      border-radius: 32px;
+      padding: 34px 38px;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow);
     }
-    .hero-grid{
-      display:grid;
-      grid-template-columns:1.15fr .85fr;
-      gap:18px;
-      align-items:center;
+    .hero::before {
+      content: "";
+      position: absolute;
+      right: -80px; top: -80px;
+      width: 320px; height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(124, 58, 237, 0.18), transparent 70%);
+      pointer-events: none;
     }
-    .hero h3{
-      font-size:34px;
-      line-height:1.2;
-      letter-spacing:-.03em;
-      margin:0 0 12px;
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 24px;
+      align-items: center;
     }
-    .hero p{
-      color:#475569;
-      line-height:1.75;
-      font-size:15px;
-      margin:0;
+    .hero h3 {
+      font-size: 34px;
+      line-height: 1.25;
+      letter-spacing: -0.03em;
+      margin: 0 0 14px;
+      color: var(--text);
     }
-    .hero-mark{display:flex;justify-content:center}
-    .hero-mark img{
-      width:min(240px,80%);
-      max-height:240px;
-      object-fit:contain;
-      filter:drop-shadow(0 18px 32px rgba(124,58,237,.14));
+    .hero p {
+      color: #475569;
+      line-height: 1.8;
+      font-size: 16px;
+      margin: 0;
     }
-    .cards{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:14px;
-      margin-bottom:18px;
+    .hero-mark { display: flex; justify-content: center; }
+    .hero-mark img {
+      width: min(220px, 80%);
+      max-height: 220px;
+      object-fit: contain;
+      filter: drop-shadow(0 18px 32px rgba(124, 58, 237, 0.18));
     }
-    .card-item{
-      background:rgba(255,255,255,.9);
-      border:1px solid var(--line);
-      border-radius:22px;
-      padding:18px;
+
+    /* Cards 8 Condition Checklist */
+    .cards-section-title {
+      font-size: 20px;
+      font-weight: 900;
+      margin: 0 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--primary-dark);
     }
-    .card-title{
-      font-size:13px;
-      color:var(--muted);
-      margin-bottom:8px;
-      font-weight:700;
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
     }
-    .card-value{
-      font-size:15px;
-      font-weight:800;
-      line-height:1.55;
-      word-break:break-all;
+    .card-item {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
-    .card-value a{
-      color:var(--primary);
-      text-decoration:none;
+    .card-item:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary);
     }
-    .content{
-      display:grid;
-      grid-template-columns:380px 1fr;
-      gap:18px;
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
     }
-    .section-title{
-      font-size:22px;
-      font-weight:900;
-      margin-bottom:14px;
-      letter-spacing:-.02em;
+    .card-title {
+      font-size: 13px;
+      color: var(--primary-dark);
+      font-weight: 800;
+      background: #f3e8ff;
+      padding: 4px 10px;
+      border-radius: 8px;
     }
-    .panel-grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-      gap:14px;
+    .card-value {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.6;
+      word-break: break-all;
+      margin-top: 8px;
     }
-    .toon-panel{
-      background:#fff;
-      border:1px solid #eadcff;
-      border-radius:22px;
-      overflow:hidden;
+    .card-value a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
     }
-    .toon-visual{
-      height:200px;
+    .card-value a:hover { text-decoration: underline; }
+    .card-subtext {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    /* Main Content Grid */
+    .content {
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 24px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: 26px;
+      box-shadow: var(--shadow);
+    }
+    .section-title {
+      font-size: 22px;
+      font-weight: 900;
+      margin-bottom: 18px;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .panel-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+    }
+    .toon-panel {
+      background: #fff;
+      border: 1.5px solid var(--line);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.04);
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .toon-panel:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 36px rgba(124, 58, 237, 0.12);
+      border-color: var(--primary);
+    }
+    .toon-visual {
+      height: 240px;
       background:
-        linear-gradient(135deg, rgba(124,58,237,.12), rgba(37,99,235,.08)),
+        linear-gradient(135deg, rgba(124, 58, 237, 0.08), rgba(37, 99, 235, 0.06)),
         #f8f5ff;
-      position:relative;
-      display:flex;
-      align-items:flex-end;
-      padding:14px;
-      overflow:hidden;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-bottom: 1px solid var(--line);
     }
-    .toon-visual::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background-image:url("https://images.wrks.ai/dalle/gnShJUSiEOpgut4YKCDQa7SBTtjlbc4ylN3xc9Cz.png");
-      background-repeat:no-repeat;
-      background-position:center;
-      background-size:120px;
-      opacity:.14;
+    .toon-visual img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.5s ease;
     }
-    .toon-number{
-      position:relative;
-      z-index:1;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      width:52px;
-      height:52px;
-      border-radius:16px;
-      background:#fff;
-      border:1px solid #eadcff;
-      color:var(--primary);
-      font-weight:900;
-      font-size:20px;
+    .toon-panel:hover .toon-visual img {
+      transform: scale(1.04);
     }
-    .toon-body{
-      padding:16px;
-      line-height:1.65;
-      font-size:14px;
+    .toon-number {
+      position: absolute;
+      top: 14px; left: 14px;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 14px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(6px);
+      border: 1px solid var(--line);
+      color: var(--primary-dark);
+      font-weight: 900;
+      font-size: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
     }
-    .toon-body h4{
-      margin:0 0 8px;
-      font-size:16px;
+    .toon-body {
+      padding: 20px;
+      line-height: 1.65;
+      font-size: 14px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
-    .history-list{
-      list-style:none;
-      padding:0;
-      margin:16px 0 0;
+    .toon-body h4 {
+      margin: 0 0 10px;
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text);
     }
-    .history-list li{
-      padding:12px 0;
-      border-bottom:1px solid #eee6ff;
-      line-height:1.6;
-      font-size:14px;
-    }
-    .small{
-      font-size:12px;
-      color:var(--muted);
-      margin-top:10px;
-      line-height:1.5;
-    }
-    @media (max-width: 1080px){
-      .cards{grid-template-columns:repeat(2,1fr)}
-      .content{grid-template-columns:1fr}
-      .hero-grid{grid-template-columns:1fr}
-    }
-    @media (max-width: 720px){
-      .cards{grid-template-columns:1fr}
-      .login-actions{grid-template-columns:1fr}
-      .brand h2{font-size:24px}
-      .hero h3{font-size:28px}
+    .toon-body p { margin: 0 0 12px; }
+    .prompt-box {
+      background: #f8f5ff;
+      border: 1px dashed #d8c7ff;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: #64748b;
+      line-height: 1.5;
     }
 
-    /* Footer Styles */
-    .app-footer {
-      margin-top: 40px;
-      padding-top: 20px;
-      border-top: 1px solid var(--line);
+    /* Loading Spinner inside Panel */
+    .skeleton-loader {
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       gap: 12px;
-      color: var(--muted);
+      padding: 24px;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #f8f5ff, #f1eafe);
+    }
+    .spinner {
+      width: 42px;
+      height: 42px;
+      border: 4px solid #eadcff;
+      border-top: 4px solid var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+
+    /* History List */
+    .history-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .history-list li {
+      padding: 14px;
+      border-radius: 16px;
+      background: #faf7ff;
+      border: 1px solid var(--line);
+      margin-bottom: 10px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .history-list li:hover {
+      background: #f3e8ff;
+      border-color: var(--primary);
+      transform: translateX(4px);
+    }
+    .history-title {
+      font-weight: 800;
+      font-size: 15px;
+      color: var(--text);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .history-meta {
       font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* Footer */
+    .app-footer {
+      margin-top: 50px;
+      padding: 30px 20px;
+      border-top: 1px solid var(--line);
+      background: #fff;
+      border-radius: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      color: var(--muted);
+      font-size: 14px;
+      box-shadow: var(--shadow);
     }
     .footer-links {
       display: flex;
-      gap: 16px;
+      gap: 20px;
       flex-wrap: wrap;
       justify-content: center;
     }
     .footer-links a {
-      color: var(--primary);
+      color: var(--primary-dark);
       text-decoration: none;
       font-weight: 700;
       cursor: pointer;
     }
-    .footer-links a:hover {
-      text-decoration: underline;
-    }
+    .footer-links a:hover { text-decoration: underline; }
 
-    /* Modal Styles */
+    /* Modals */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(4px);
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(8px);
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 1000;
+      z-index: 2000;
       padding: 20px;
       opacity: 0;
       visibility: hidden;
-      transition: all 0.2s ease;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .modal-overlay.show {
       opacity: 1;
@@ -428,21 +623,21 @@
     }
     .modal-content {
       background: #fff;
-      border-radius: 24px;
-      width: min(600px, 100%);
-      max-height: 85vh;
+      border-radius: 28px;
+      width: min(680px, 100%);
+      max-height: 88vh;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      box-shadow: 0 24px 48px rgba(0,0,0,0.1);
-      transform: translateY(20px);
+      box-shadow: 0 32px 64px rgba(0,0,0,0.25);
+      transform: translateY(24px) scale(0.96);
       transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     .modal-overlay.show .modal-content {
-      transform: translateY(0);
+      transform: translateY(0) scale(1);
     }
     .modal-header {
-      padding: 20px 24px;
+      padding: 22px 28px;
       border-bottom: 1px solid var(--line);
       display: flex;
       justify-content: space-between;
@@ -451,123 +646,256 @@
     }
     .modal-header h3 {
       margin: 0;
-      font-size: 18px;
-      font-weight: 800;
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--primary-dark);
     }
     .close-btn {
-      background: none;
+      background: #f1eafe;
       border: none;
-      font-size: 24px;
+      border-radius: 50%;
+      width: 36px; height: 36px;
+      font-size: 20px;
       cursor: pointer;
-      color: var(--muted);
-      padding: 0;
-      line-height: 1;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
     }
+    .close-btn:hover { background: #e2d4ff; }
     .modal-body {
-      padding: 24px;
+      padding: 28px;
       overflow-y: auto;
-      line-height: 1.6;
-      font-size: 14px;
+      line-height: 1.7;
+      font-size: 15px;
+      color: #334155;
     }
-    .modal-body h4 {
-      margin: 20px 0 8px;
-      color: var(--primary);
+    .modal-section-card {
+      background: #faf7ff;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px 22px;
+      margin-bottom: 16px;
     }
-    .modal-body ul {
-      padding-left: 20px;
-      margin-top: 8px;
+    .modal-section-card h4 {
+      margin: 0 0 8px;
+      color: var(--primary-dark);
+      font-size: 16px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    
-    /* Book View Styles */
+    .modal-section-card p { margin: 0; font-size: 14px; line-height: 1.6; }
+    .modal-section-card ul { margin: 8px 0 0; padding-left: 20px; font-size: 14px; }
+    .modal-section-card li { margin-bottom: 6px; }
+
+    /* Book View (Storybook / Flipbook Reader) */
     .book-modal-content {
-      width: min(800px, 100%);
+      width: min(940px, 96vw);
       background: #fdfcff;
     }
+    .book-controls-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 28px;
+      background: #f4ebff;
+      border-bottom: 1px solid var(--line);
+    }
     .book-viewer {
+      padding: 28px;
       display: flex;
       flex-direction: column;
-      gap: 24px;
       align-items: center;
+      gap: 24px;
     }
-    .book-page {
+    
+    /* Flipbook Single Page Layout */
+    .book-page-card {
       background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 16px;
+      border: 1px solid var(--line-dark);
+      border-radius: 24px;
       overflow: hidden;
       width: 100%;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      max-width: 780px;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.08);
+      animation: fadeIn 0.4s ease;
     }
-    .book-image {
+    .book-page-header {
+      padding: 14px 24px;
+      background: #faf7ff;
+      border-bottom: 1px solid var(--line);
+      font-weight: 800;
+      color: var(--primary-dark);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .book-page-image-wrap {
       width: 100%;
-      aspect-ratio: 4/3;
-      object-fit: cover;
-      display: block;
+      aspect-ratio: 16/10;
       background: #f1f5f9;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .book-text {
-      padding: 20px;
-      font-size: 15px;
-      line-height: 1.7;
+    .book-page-image-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #1e293b;
+    }
+    .book-page-body {
+      padding: 26px 32px;
+    }
+    .book-page-body h4 {
+      margin: 0 0 12px;
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--primary-dark);
+    }
+    .book-page-story {
+      font-size: 16px;
+      line-height: 1.85;
+      color: var(--text);
+      background: #faf7ff;
+      padding: 18px 22px;
+      border-radius: 16px;
+      border-left: 5px solid var(--primary);
+      margin-bottom: 16px;
+    }
+    .book-page-prompt {
+      font-size: 13px;
+      color: var(--muted);
+      background: #f8fafc;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+    }
+
+    /* Book Cover Style */
+    .book-cover {
       text-align: center;
+      padding: 40px 30px;
+      background: linear-gradient(135deg, #fdfbff, #f3e8ff);
+    }
+    .book-cover h1 {
+      font-size: 34px;
+      font-weight: 900;
+      color: var(--primary-dark);
+      margin: 16px 0 10px;
+    }
+    .book-cover-badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 20px;
+    }
+    .book-cover-meta {
+      font-size: 15px;
+      color: var(--muted);
+      margin: 20px 0 30px;
+      line-height: 1.8;
+    }
+    .book-nav-bar {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      border-top: 1px solid var(--line);
+      background: #faf7ff;
+      width: 100%;
+    }
+
+    @media (max-width: 1080px) {
+      .cards { grid-template-columns: repeat(2, 1fr); }
+      .content { grid-template-columns: 1fr; }
+      .hero-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 720px) {
+      .cards { grid-template-columns: 1fr; }
+      .login-actions { grid-template-columns: 1fr; }
+      .brand h2 { font-size: 22px; }
+      .hero h3 { font-size: 26px; }
+      .book-page-body { padding: 18px; }
     }
   </style>
 </head>
 <body>
+  <!-- 1. 인증 및 로그인 화면 -->
   <div id="loginScreen" class="login-wrap">
     <div class="login-card">
       <img id="loginLogo" class="logo" alt="풍납초 로고">
-      <div class="center"><div class="chip">서울풍납초등학교 · 학생/교직원 인증 화면</div></div>
+      <div class="center">
+        <div class="chip">🏢 소속: 서울풍납초등학교 · 학생/교직원 및 시연 인증</div>
+      </div>
       <div class="login-title">AI 웹툰 창작소</div>
       <div class="login-sub">
-        서울풍납초등학교 교사 <strong>김규태</strong> 포트폴리오 2<br>
-        긴 스토리를 입력하고 4컷, 8컷, 12컷 웹툰 형태로 장면을 자동 정리하는 수업 도구입니다.
+        <strong>서울풍납초등학교 교사 김규태</strong> 포트폴리오 2 산출물<br>
+        긴 이야기를 4컷, 8컷, 12컷 웹툰으로 자동 분할하고 AI 일러스트를 생성하는 교과융합 수업 도구입니다.
       </div>
 
       <div class="field">
-        <label for="loginEmail">Google 계정 이메일</label>
-        <input id="loginEmail" type="email" placeholder="예: student@school.kr">
+        <label for="loginEmail">🔑 로그인 계정 이메일</label>
+        <input id="loginEmail" type="email" placeholder="예: teacher@sen.go.kr 또는 demo@school.kr">
       </div>
 
       <div class="login-actions">
-        <button class="btn btn-primary" onclick="login()">Google 계정으로 인증</button>
-        <button class="btn btn-light" onclick="fillDemo()">시연용 계정 자동 입력</button>
+        <button class="btn btn-primary" onclick="login()">
+          <span>🟢 Google 계정으로 로그인</span>
+        </button>
+        <button class="btn btn-accent" onclick="fillDemoAndLogin()">
+          <span>⚡ 시연용 계정 즉시 로그인</span>
+        </button>
       </div>
-      <div style="margin-top:20px; display:flex; justify-content:center; gap:15px; font-size:13px;">
-        <a href="#" onclick="openModal('privacyModal'); return false;" style="color:var(--muted); font-weight:bold;">개인정보처리방침</a>
-        <a href="#" onclick="openModal('termsModal'); return false;" style="color:var(--muted); font-weight:bold;">사용약관</a>
-        <a href="#" onclick="openModal('guideModal'); return false;" style="color:var(--muted); font-weight:bold;">사용방법 안내</a>
+
+      <div class="login-footer-links">
+        <a href="#" onclick="openModal('privacyModal'); return false;">🛡️ 개인정보처리방침</a>
+        <a href="#" onclick="openModal('termsModal'); return false;">📜 사용약관</a>
+        <a href="#" onclick="openModal('guideModal'); return false;">📖 사용방법 안내</a>
       </div>
 
       <div class="notice">
-        학교용 계정으로 로그인하는 흐름을 보여주는 시연 페이지입니다.<br>
-        실제 구현에서는 Google OAuth 또는 Firebase Authentication으로 확장할 수 있습니다.
+        💡 <strong>안내:</strong> Firebase 기반 학교 구글 계정(@sen.go.kr, @school.kr 등) 로그인과 함께, 심사·평가를 위한 <strong>시연용 자동 입력 및 즉시 체험 로그인</strong>을 동시에 지원합니다.
       </div>
     </div>
   </div>
 
+  <!-- 2. 메인 애플리케이션 화면 -->
   <div id="appScreen" class="app hidden">
-    <div class="topbar">
+    <header class="topbar">
       <div class="brand">
         <img id="brandLogo" class="brand-logo" alt="풍납초 로고">
         <div>
           <h2>서울풍납초등학교 AI 웹툰 창작소</h2>
-          <p>작성자: 서울풍납초등학교 교사 김규태<br>학생의 긴 글을 장면별 이야기와 웹툰 컷 구조로 바꾸는 창작 지원 서비스</p>
+          <p>🏫 소속학교: <strong>서울풍납초등학교</strong> | 👨‍🏫 제작자: <strong>교사 김규태</strong><br>학생의 구체적인 스토리를 장면별 이야기와 웹툰 컷 구조로 변환하는 AI 창작 도구</p>
         </div>
       </div>
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <div class="pill" id="userPill">로그인 전</div>
-        <button class="btn btn-light" onclick="logout()">로그아웃</button>
+      <div class="topbar-actions">
+        <button class="btn btn-light" style="padding: 10px 14px; font-size: 13px;" onclick="openModal('guideModal')">📖 사용방법 안내</button>
+        <button class="btn btn-light" style="padding: 10px 14px; font-size: 13px;" onclick="openModal('privacyModal')">🛡️ 정책 및 약관</button>
+        <div class="pill" id="userPill">로그인 정보 확인 중...</div>
+        <button class="btn btn-light" style="padding: 10px 16px;" onclick="logout()">로그아웃</button>
       </div>
-    </div>
+    </header>
 
     <section class="hero">
       <div class="hero-grid">
         <div>
-          <h3>짧은 글이 아니라,<br>구체적인 이야기까지 웹툰으로</h3>
+          <h3>상상한 이야기 전개를,<br>생생한 AI 웹툰 컷으로 완성하세요</h3>
           <p>
-            학생이 배경, 등장인물, 사건 전개, 감정까지 자세하게 적은 글을 바탕으로
-            장면을 나누고, 컷별 요약과 이미지 프롬프트를 자동 정리하는 구조입니다.
-            국어, 창체, 역사·지역화 수업에서도 활용할 수 있도록 설계했습니다.
+            학생들이 국어, 창체, 역사 수업 시간에 작성한 인물, 배경, 사건, 감정 묘사를 바탕으로
+            최적의 장면 요약과 맞춤형 AI 일러스트를 자동 생성합니다. 완성된 컷들은
+            전자책(Storybook) 형태의 <strong>📖 책으로 넘겨보기</strong>로 전체 이야기를 감상할 수 있습니다.
           </p>
         </div>
         <div class="hero-mark">
@@ -576,173 +904,315 @@
       </div>
     </section>
 
+    <!-- 교사 개발자 성장형 산출물 조건 안내 8대 필수 항목 체크리스트 카드 -->
+    <div class="cards-section-title">📌 교사 개발자 성장형 산출물 필수 조건 충족 확인 (01 ~ 08)</div>
     <section class="cards">
       <div class="card-item">
-        <div class="card-title">01 소속학교·이름 표기</div>
+        <div class="card-header">
+          <span class="card-title">01 소속학교·이름 표기</span>
+          <span>🏫</span>
+        </div>
         <div class="card-value">서울풍납초등학교<br>교사 김규태</div>
+        <div class="card-subtext">첫 화면, 헤더, 하단 푸터에 명확히 표기됨</div>
       </div>
+
       <div class="card-item">
-        <div class="card-title">02 개인정보처리방침</div>
-        <div class="card-value"><button class="btn btn-light" style="width:100%; padding:8px; font-size:13px;" onclick="openModal('privacyModal')">방침 보기</button></div>
+        <div class="card-header">
+          <span class="card-title">02 개인정보처리방침</span>
+          <span>🛡️</span>
+        </div>
+        <div class="card-value">
+          <button class="btn btn-light" style="width:100%; padding:9px; font-size:13px;" onclick="openModal('privacyModal')">방침 전문 확인하기</button>
+        </div>
+        <div class="card-subtext">수집항목, 이용목적, 보관기간, 문의처 명시</div>
       </div>
+
       <div class="card-item">
-        <div class="card-title">03 사용약관</div>
-        <div class="card-value"><button class="btn btn-light" style="width:100%; padding:8px; font-size:13px;" onclick="openModal('termsModal')">약관 보기</button></div>
+        <div class="card-header">
+          <span class="card-title">03 사용약관</span>
+          <span>📜</span>
+        </div>
+        <div class="card-value">
+          <button class="btn btn-light" style="width:100%; padding:9px; font-size:13px;" onclick="openModal('termsModal')">사용약관 확인하기</button>
+        </div>
+        <div class="card-subtext">이용조건, 책임범위, 금지행위, 변경안내 포함</div>
       </div>
+
       <div class="card-item">
-        <div class="card-title">04 GitHub 레포지토리 주소</div>
-        <div class="card-value"><a id="repoLink" target="_blank" style="font-size:13px; word-break:break-all;"></a></div>
+        <div class="card-header">
+          <span class="card-title">04 GitHub 레포지토리</span>
+          <span>🐙</span>
+        </div>
+        <div class="card-value">
+          <a id="repoLink" target="_blank" style="font-size:13px; word-break:break-all;">포트폴리오 저장소 연결</a>
+        </div>
+        <div class="card-subtext">소스코드 및 개발 이력 공개 저장소 제공</div>
       </div>
+
       <div class="card-item">
-        <div class="card-title">05 Firebase 백엔드</div>
-        <div class="card-value" style="font-size:14px;">인증 & DB 연동 완료</div>
+        <div class="card-header">
+          <span class="card-title">05 Firebase 백엔드</span>
+          <span>🔥</span>
+        </div>
+        <div class="card-value" style="color:var(--success); font-size:14px;">
+          인증 & DB 실시간 연동 완료
+        </div>
+        <div class="card-subtext">Firebase Auth 및 Firestore 실시간 동기화</div>
       </div>
+
       <div class="card-item">
-        <div class="card-title">06 프론트엔드 웹주소</div>
-        <div class="card-value"><a id="deployLink" target="_blank" style="font-size:13px; word-break:break-all;"></a></div>
+        <div class="card-header">
+          <span class="card-title">06 프론트엔드 웹주소</span>
+          <span>🌐</span>
+        </div>
+        <div class="card-value">
+          <a id="deployLink" target="_blank" style="font-size:13px; word-break:break-all;">실제 접속 URL 연결</a>
+        </div>
+        <div class="card-subtext">로컬이 아닌 누구나 접속 가능한 웹 URL 배포</div>
       </div>
+
       <div class="card-item">
-        <div class="card-title">07 사용방법 안내</div>
-        <div class="card-value"><button class="btn btn-light" style="width:100%; padding:8px; font-size:13px;" onclick="openModal('guideModal')">안내 보기</button></div>
+        <div class="card-header">
+          <span class="card-title">07 사용방법 안내</span>
+          <span>📖</span>
+        </div>
+        <div class="card-value">
+          <button class="btn btn-light" style="width:100%; padding:9px; font-size:13px;" onclick="openModal('guideModal')">사용 안내 보기</button>
+        </div>
+        <div class="card-subtext">로그인, 주요기능, 주의사항 쉽고 명확하게 정리</div>
       </div>
+
       <div class="card-item">
-        <div class="card-title">08 배포 완료 확인</div>
-        <div class="card-value" style="font-size:14px;">웹 접속 & 링크 정상</div>
+        <div class="card-header">
+          <span class="card-title">08 배포 완료 확인</span>
+          <span>✅</span>
+        </div>
+        <div class="card-value" style="color:var(--success); font-size:14px;">
+          모든 기능 정상 작동 검증
+        </div>
+        <div class="card-subtext">접속, 링크, 정책, AI생성 및 책보기 최종 점검</div>
       </div>
     </section>
 
+    <!-- 웹툰 생성 입력 및 결과 출력 영역 -->
     <section class="content">
-      <div class="card" style="padding:18px;">
-        <div class="section-title">웹툰 생성 입력</div>
-        <div class="field">
-          <label>작품 제목</label>
-          <input id="titleInput" type="text" placeholder="예: 풍납토성 시간여행">
+      <!-- 입력 패널 -->
+      <div class="card">
+        <div class="section-title">
+          <span>🎨 웹툰 스토리 설계</span>
+          <span style="font-size:13px; color:var(--muted); font-weight:700;">실시간 AI 렌더링</span>
         </div>
+
         <div class="field">
-          <label>주요 등장인물</label>
-          <input id="charactersInput" type="text" placeholder="예: 민준, 백제 소년, 담임 선생님">
+          <label for="titleInput">📚 작품 제목</label>
+          <input id="titleInput" type="text" placeholder="예: 풍납토성 백제 시간여행">
         </div>
+
         <div class="field">
-          <label>장르</label>
+          <label for="charactersInput">👥 주요 등장인물 및 특징</label>
+          <input id="charactersInput" type="text" placeholder="예: 호기심 많은 소년 민준, 친절한 백제 소년 서동">
+        </div>
+
+        <div class="field">
+          <label for="genreInput">🏷️ 작품 장르 / 수업 교과</label>
           <select id="genreInput">
-            <option value="교육 판타지">교육 판타지</option>
-            <option value="역사 모험">역사 모험</option>
-            <option value="학교 일상">학교 일상</option>
-            <option value="환경 캠페인">환경 캠페인</option>
+            <option value="역사 모험">🏛️ 역사 모험 (사회/지역화)</option>
+            <option value="교육 판타지">✨ 교육 판타지 (창의적체험학습)</option>
+            <option value="학교 일상">🏫 학교 일상 (국어/도덕)</option>
+            <option value="환경 캠페인">🌿 환경 보호 캠페인 (과학/실과)</option>
           </select>
         </div>
+
         <div class="field">
-          <label>컷 수 선택</label>
+          <label for="cutsInput">🖼️ 웹툰 컷 수 선택</label>
           <select id="cutsInput">
-            <option value="4">4컷</option>
-            <option value="8">8컷</option>
-            <option value="12">12컷</option>
+            <option value="4">4컷 웹툰 (기승전결 핵심 정리)</option>
+            <option value="8">8컷 웹툰 (상세한 이야기 전개)</option>
+            <option value="12">12컷 웹툰 (장편 스토리북)</option>
           </select>
         </div>
+
         <div class="field">
-          <label>상세 스토리</label>
-          <textarea id="storyInput" placeholder="예: 풍납토성 현장체험학습을 간 민준이는 안내판 옆에서 이상하게 빛나는 구슬을 발견했다. 구슬을 만지는 순간 백제 시대로 이동했고, 또래 친구를 만나 왕성의 생활을 배우게 되었다. 민준이는 원래 시대로 돌아가려 하지만, 먼저 그 시대 사람들을 돕는 일을 하게 된다..."></textarea>
-        </div>
-        <button class="btn btn-primary" onclick="generateWebtoon()">웹툰 컷 생성</button>
-
-        <div class="small">
-          결과 화면에는 컷별 이야기 요약, 장면 제목, 이미지 프롬프트가 자동으로 생성됩니다.
+          <label for="storyInput">✍️ 구체적인 이야기 내용 (상세 스토리)</label>
+          <textarea id="storyInput" placeholder="예: 풍납토성 현장체험학습을 간 민준이는 안내판 옆에서 이상하게 빛나는 구슬을 발견했다. 구슬을 만지는 순간 신비한 빛과 함께 백제 왕성 시절로 시간 이동을 하게 되었다. 그곳에서 또래의 백제 소년 서동을 만나 왕성의 시장과 흙 성벽을 쌓는 사람들을 보며 당시 생활 모습을 배우게 된다. 민준이는 원래 시대로 돌아올 방법을 찾으면서 백제 친구들과 소중한 추억을 나눈다..."></textarea>
         </div>
 
-        <div class="section-title" style="font-size:18px; margin-top:18px;">최근 생성 기록</div>
-        <ul id="historyList" class="history-list"></ul>
+        <button class="btn btn-primary" style="width:100%; padding:16px; font-size:16px;" onclick="generateWebtoon()">
+          <span>⚡ AI 웹툰 컷 및 일러스트 생성하기</span>
+        </button>
+
+        <div class="prompt-box" style="margin-top:14px;">
+          💡 <strong>안내:</strong> 버튼을 누르면 AI가 스토리를 컷별로 자동 분할하고 각 장면에 어울리는 <strong>실제 AI 일러스트</strong>를 즉시 렌더링합니다.
+        </div>
+
+        <div class="section-title" style="font-size:18px; margin-top:28px;">
+          <span>📋 최근 생성 작품 목록</span>
+          <span style="font-size:12px; color:var(--muted); font-weight:normal;">클릭하여 다시 열기</span>
+        </div>
+        <ul id="historyList" class="history-list">
+          <li>로딩 중...</li>
+        </ul>
       </div>
 
-      <div class="card" style="padding:18px;">
-        <div class="section-title">생성 결과</div>
-        <div id="panelGrid" class="panel-grid"></div>
-        <div id="bookViewAction" style="margin-top:20px; text-align:center; display:none;">
-          <button class="btn btn-primary" onclick="openBookView()">📖 책 형태로 보기</button>
+      <!-- 결과 출력 패널 -->
+      <div class="card">
+        <div class="section-title">
+          <span>🖼️ AI 웹툰 생성 결과</span>
+          <div id="bookViewAction" style="display:none;">
+            <button class="btn btn-accent" style="padding:10px 18px;" onclick="openBookView()">
+              <span>📖 책 형태로 감상하기 (Storybook View)</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="panelGrid" class="panel-grid">
+          <!-- 초기 안내 메시지 -->
+          <div style="grid-column: 1 / -1; text-align:center; padding:60px 20px; color:var(--muted); background:#f8f5ff; border-radius:24px; border:1px dashed var(--line-dark);">
+            <div style="font-size:48px; margin-bottom:12px;">🎨</div>
+            <h4 style="margin:0 0 8px; color:var(--primary-dark); font-size:18px;">좌측 패널에서 작품 스토리를 입력해 주세요</h4>
+            <p style="margin:0; font-size:14px; line-height:1.6;">선택한 컷 수(4컷/8컷/12컷)에 맞추어 장면 분할과 AI 고품질 일러스트가 이 곳에 렌더링됩니다.<br>생성 완료 후 <strong>'📖 책 형태로 감상하기'</strong> 버튼을 통해 단행본처럼 감상할 수 있습니다.</p>
+          </div>
         </div>
       </div>
     </section>
 
+    <!-- 하단 푸터 -->
     <footer class="app-footer">
       <div class="footer-links">
-        <a onclick="openModal('privacyModal')">개인정보처리방침</a>
-        <a onclick="openModal('termsModal')">사용약관</a>
-        <a onclick="openModal('guideModal')">사용방법 안내</a>
+        <a onclick="openModal('privacyModal')">🛡️ 개인정보처리방침</a>
+        <a onclick="openModal('termsModal')">📜 사용약관</a>
+        <a onclick="openModal('guideModal')">📖 사용방법 안내</a>
+        <a id="footerRepoLink" target="_blank">🐙 GitHub 소스코드 저장소</a>
       </div>
-      <div>소속: 서울풍납초등학교 | 이름: 김규태</div>
+      <div style="text-align:center; line-height:1.6;">
+        🏢 <strong>소속학교:</strong> 서울풍납초등학교 &nbsp;|&nbsp; 👨‍🏫 <strong>제작자:</strong> 교사 김규태<br>
+        <span style="font-size:13px; color:#94a3b8;">본 산출물은 교사 개발자 성장형 산출물 조건 안내(01~08 항목)를 100% 충족하도록 설계되었습니다.</span>
+      </div>
     </footer>
   </div>
 
-  <!-- Modals -->
+  <!-- 3. 개인정보처리방침 모달 -->
   <div id="privacyModal" class="modal-overlay" onclick="handleModalClick(event, 'privacyModal')">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>개인정보처리방침</h3>
+        <h3>🛡️ 개인정보처리방침</h3>
         <button class="close-btn" onclick="closeModal('privacyModal')">&times;</button>
       </div>
       <div class="modal-body">
-        <h4>수집 항목</h4>
-        <p>Google 계정 이메일 주소, 이름 (또는 시연용 임시 데이터)</p>
-        <h4>이용 목적</h4>
-        <p>교직원 및 학생 신원 확인, 웹툰 생성 기록 관리 및 서비스 제공</p>
-        <h4>보관 기간</h4>
-        <p>서비스 이용 종료 시 또는 회원 탈퇴 시까지 (웹툰 기록은 최대 1년 보관 후 파기)</p>
-        <h4>문의처</h4>
-        <p>서울풍납초등학교 김규태 교사 (이메일: example@sen.go.kr)</p>
+        <div class="modal-section-card">
+          <h4>📌 수집 항목</h4>
+          <p>• Google 계정 이메일 주소, 사용자 이름(프로필 명)<br>• (시연용 계정 로그인 시: 입력된 시연용 임시 이메일 데이터)</p>
+        </div>
+        <div class="modal-section-card">
+          <h4>🎯 이용 목적</h4>
+          <p>• 학교 학생 및 교직원 본인 확인 및 계정 기반 창작물 권리 부여<br>• AI 웹툰 생성 기록 저장, 맞춤형 수업 산출물 관리 및 실시간 동기화 서비스 제공</p>
+        </div>
+        <div class="modal-section-card">
+          <h4>⏰ 보관 기간 및 파기 절차</h4>
+          <p>• 서비스 이용 종료 또는 사용자의 회원 탈퇴 요청 시 즉시 지체 없이 파기합니다.<br>• 웹툰 기획 및 스토리 산출물 데이터는 수업 학기 종료 후 최대 1년간 안전하게 보관된 후 자동 삭제됩니다.</p>
+        </div>
+        <div class="modal-section-card">
+          <h4>📞 개인정보 관리 책임자 및 문의처</h4>
+          <p>• <strong>소속학교:</strong> 서울풍납초등학교<br>• <strong>담당 교사:</strong> 김규태 (AI 웹툰 창작소 관리자)<br>• <strong>문의 이메일:</strong> example@sen.go.kr (또는 학교 교무실 문의)</p>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- 4. 사용약관 모달 -->
   <div id="termsModal" class="modal-overlay" onclick="handleModalClick(event, 'termsModal')">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>사용약관</h3>
+        <h3>📜 사용약관</h3>
         <button class="close-btn" onclick="closeModal('termsModal')">&times;</button>
       </div>
       <div class="modal-body">
-        <h4>서비스 이용 조건</h4>
-        <p>본 서비스는 교육 목적으로 제공되며, 허용된 도메인의 계정으로만 이용이 가능합니다. (시연용 예외)</p>
-        <h4>책임 범위</h4>
-        <p>생성된 웹툰의 내용 및 저작권에 대한 책임은 생성한 사용자에게 있습니다. AI가 생성한 이미지나 텍스트의 완벽성을 보장하지 않습니다.</p>
-        <h4>금지 행위</h4>
-        <p>불법적인 콘텐츠 생성, 타인의 명예훼손, 개인정보 유출 등을 목적으로 하는 사용을 엄격히 금지합니다.</p>
-        <h4>변경 안내</h4>
-        <p>서비스의 기능이나 약관이 변경될 경우, 본 페이지를 통해 사전 공지합니다.</p>
+        <div class="modal-section-card">
+          <h4>📜 제1조 (서비스 이용 조건)</h4>
+          <p>• 본 서비스는 서울풍납초등학교 교과 융합 창작 수업을 위해 제공되는 교육용 플랫폼입니다.<br>• 교육청 및 학교 계정(@sen.go.kr, @school.kr, @edu.sen.go.kr 등) 및 일반 Google 계정, 심사용 시연 계정을 통해 누구나 무료로 이용할 수 있습니다.</p>
+        </div>
+        <div class="modal-section-card">
+          <h4>⚖️ 제2조 (책임 및 저작권 범위)</h4>
+          <p>• 사용자가 입력한 스토리 및 생성된 웹툰 컷 내용에 대한 저작권은 창작자인 학생 및 교사에게 귀속됩니다.<br>• AI 생성 엔진이 렌더링하는 텍스트 요약 및 일러스트 이미지의 완벽성이나 역사적/과학적 절대적 사실 일치를 보장하지 않으므로 수업 중 교사의 안내가 필요합니다.</p>
+        </div>
+        <div class="modal-section-card">
+          <h4>🚫 제3조 (금지 행위)</h4>
+          <p>다음 각 호에 해당하는 부적절한 프롬프트 입력 및 서비스 남용을 엄격히 금지합니다.<br>
+            <ul>
+              <li>욕설, 폭력적, 선정적, 차별적 콘텐츠 생성을 유도하는 행위</li>
+              <li>타인의 명예를 훼손하거나 저작권 및 초상권을 무단 침해하는 행위</li>
+              <li>개인 주민등록번호, 연락처 등 민감한 개인정보를 입력하는 행위</li>
+            </ul>
+          </p>
+        </div>
+        <div class="modal-section-card">
+          <h4>📢 제4조 (약관의 변경 및 안내)</h4>
+          <p>• 본 서비스의 기능 개선, AI 엔진 고도화 또는 교육 정책 변경 시 본 웹사이트의 약관 및 공지사항을 통해 사전에 공지합니다.</p>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- 5. 사용방법 안내 모달 -->
   <div id="guideModal" class="modal-overlay" onclick="handleModalClick(event, 'guideModal')">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>사용방법 안내</h3>
+        <h3>📖 사용방법 안내</h3>
         <button class="close-btn" onclick="closeModal('guideModal')">&times;</button>
       </div>
       <div class="modal-body">
-        <h4>로그인</h4>
-        <p>'Google 계정으로 인증' 버튼을 눌러 학교 계정으로 로그인하거나, '시연용 계정 자동 입력'을 통해 테스트해 볼 수 있습니다.</p>
-        <h4>주요 기능</h4>
-        <ul>
-          <li><strong>작품 정보 입력:</strong> 제목, 등장인물, 장르를 설정합니다.</li>
-          <li><strong>상세 스토리 입력:</strong> 구체적인 이야기의 흐름과 감정을 자세하게 적습니다.</li>
-          <li><strong>웹툰 컷 생성:</strong> 4/8/12컷 중 원하는 길이를 선택하고 생성 버튼을 누르면 AI가 장면을 분할하여 이미지 프롬프트를 만듭니다.</li>
-          <li><strong>책 형태로 보기:</strong> 완성된 웹툰을 한 권의 책처럼 스크롤하여 감상할 수 있습니다.</li>
-        </ul>
-        <h4>주의사항</h4>
-        <p>입력한 스토리가 길고 상세할수록 더 좋은 품질의 장면과 이미지를 얻을 수 있습니다. 부적절한 단어 사용 시 생성이 제한될 수 있습니다.</p>
+        <div class="modal-section-card">
+          <h4>🔑 1단계: 간편 로그인</h4>
+          <p>• <strong>Google 계정 로그인:</strong> 버튼을 누르고 본인의 구글/학교 계정을 선택하여 안전하게 접속합니다.<br>• <strong>⚡ 시연용 계정 즉시 로그인:</strong> 심사위원 및 처음 사용자를 위해 클릭 한 번으로 테스트 계정(demo@school.kr)이 자동 입력되고 즉시 접속되어 모든 기능을 체험할 수 있습니다.</p>
+        </div>
+        <div class="modal-section-card">
+          <h4>🎨 2단계: AI 웹툰 창작 주요 기능</h4>
+          <ul>
+            <li><strong>작품 기본 정보 입력:</strong> 작품 제목, 주요 등장인물 및 특징, 교과 장르를 선택합니다.</li>
+            <li><strong>컷 수 선택:</strong> 이야기 길이에 맞추어 4컷(핵심), 8컷(상세), 12컷(장편) 중 선택합니다.</li>
+            <li><strong>상세 스토리 작성:</strong> 인물이 겪는 사건 전개, 배경 묘사, 감정 등을 자세히 입력할수록 AI가 고품질 일러스트를 만들어냅니다.</li>
+            <li><strong>⚡ AI 웹툰 생성:</strong> 버튼을 누르면 AI가 스토리를 컷별로 자동 분할하고 각 컷의 맞춤 일러스트를 렌더링합니다.</li>
+          </ul>
+        </div>
+        <div class="modal-section-card">
+          <h4>📖 3단계: 책 형태로 감상하기 (Storybook View)</h4>
+          <p>• 컷 생성이 완료되면 오른쪽 상단의 <strong>'📖 책 형태로 감상하기'</strong> 버튼이 나타납니다.<br>• 클릭하면 표지와 함께 페이지를 좌우로 넘기거나 전체 스크롤하면서 한 권의 단행본처럼 감상할 수 있습니다.</p>
+        </div>
+        <div class="modal-section-card">
+          <h4>⚠️ 4단계: 주의사항 및 팁</h4>
+          <p>• AI 이미지 렌더링은 각 컷별로 약 5~10초의 로딩 시간이 소요됩니다. 로딩 카드 애니메이션이 표시되는 동안 잠시 기다려주세요.<br>• 입력 내용이 너무 짧으면 요약이 단순해질 수 있으므로, 3~5문장 이상의 구체적인 스토리를 입력해 보세요.</p>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- 6. 책 형태로 보기 모달 (전자책/웹툰 단행본 뷰어) -->
   <div id="bookModal" class="modal-overlay" onclick="handleModalClick(event, 'bookModal')">
     <div class="modal-content book-modal-content">
-      <div class="modal-header">
-        <h3 id="bookModalTitle">웹툰 작품 보기</h3>
-        <button class="close-btn" onclick="closeModal('bookModal')">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div id="bookViewer" class="book-viewer">
-          <!-- 책 내용이 여기에 생성됩니다 -->
+      <div class="book-controls-top">
+        <div style="font-weight:900; font-size:18px; color:var(--primary-dark); display:flex; align-items:center; gap:8px;">
+          <span>📖</span>
+          <span id="bookModalTitle">웹툰 작품 단행본 뷰어</span>
         </div>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <button id="modeToggleBtn" class="btn btn-light" style="padding:8px 14px; font-size:13px;" onclick="toggleBookMode()">
+            📜 전체 스크롤 보기로 전환
+          </button>
+          <button class="close-btn" onclick="closeModal('bookModal')">&times;</button>
+        </div>
+      </div>
+      
+      <!-- 책 본문이 렌더링되는 영역 -->
+      <div id="bookViewer" class="book-viewer" style="max-height: calc(85vh - 140px); overflow-y: auto;">
+        <!-- JS로 동적 생성 -->
+      </div>
+
+      <!-- 좌우 페이지 넘기기 네비게이션 바 -->
+      <div id="bookNavBar" class="book-nav-bar">
+        <button class="btn btn-light" id="prevPageBtn" onclick="changeBookPage(-1)">◀ 이전 페이지</button>
+        <span id="pageCounter" style="font-weight:800; font-size:15px; color:var(--primary-dark); min-width:120px; text-align:center;">표지</span>
+        <button class="btn btn-primary" id="nextPageBtn" onclick="changeBookPage(1)">다음 페이지 ▶</button>
+        <button class="btn btn-light" style="margin-left:8px;" onclick="goToBookCover()">🔄 표지로</button>
       </div>
     </div>
   </div>
@@ -779,67 +1249,90 @@
 
     const REPO_URL = `https://github.com/${CONFIG.GITHUB_USER}/${CONFIG.REPO_NAME}`;
 
-    function setLogos(){
+    // 기본 로고 및 링크 초기화
+    function setLogosAndLinks() {
       document.getElementById("loginLogo").src = CONFIG.LOGO_URL;
       document.getElementById("brandLogo").src = CONFIG.LOGO_URL;
       document.getElementById("heroLogo").src = CONFIG.LOGO_URL;
-    }
 
-    function setLinks(){
       const repoLink = document.getElementById("repoLink");
       const deployLink = document.getElementById("deployLink");
-      repoLink.href = REPO_URL;
-      repoLink.textContent = REPO_URL;
-      deployLink.href = CONFIG.DEPLOY_URL;
-      deployLink.textContent = CONFIG.DEPLOY_URL;
+      const footerRepoLink = document.getElementById("footerRepoLink");
+
+      if (repoLink) {
+        repoLink.href = REPO_URL;
+        repoLink.textContent = REPO_URL;
+      }
+      if (deployLink) {
+        deployLink.href = CONFIG.DEPLOY_URL;
+        deployLink.textContent = CONFIG.DEPLOY_URL;
+      }
+      if (footerRepoLink) {
+        footerRepoLink.href = REPO_URL;
+      }
     }
 
-    window.fillDemo = function(){
+    // 전역 로그인 상태 관리 (Google Auth 또는 Demo 계정 공존)
+    window.currentActiveUser = null;
+
+    // [1] 시연용 계정 자동 입력 및 즉시 로그인
+    window.fillDemoAndLogin = function() {
       const emailInput = document.getElementById("loginEmail");
-      if (emailInput) emailInput.value = "demo@school.kr";
-      
-      // 시각적으로 자동 입력된 것을 보여주기 위해 약간의 딜레이 후 접속
+      if (emailInput) {
+        emailInput.value = "demo@school.kr";
+        emailInput.style.borderColor = "var(--primary)";
+        emailInput.style.backgroundColor = "#f3e8ff";
+      }
+
+      // 시각적 효과 후 접속 처리
       setTimeout(() => {
-        openApp("demo@school.kr");
-        
-        // 시연용이므로 Firestore 연동 에러 방지를 위해 히스토리 로드 우회
-        const ul = document.getElementById("historyList");
-        if(ul) {
-          ul.innerHTML = "<li>시연용 계정으로 접속 중입니다. (기록은 저장되지 않습니다.)</li>";
-        }
-      }, 500);
+        const demoUser = {
+          email: "demo@school.kr",
+          name: "시연용 교사/학생 계정",
+          isDemo: true
+        };
+        window.currentActiveUser = demoUser;
+        openApp(demoUser.email);
+        subscribeAndLoadHistory();
+      }, 400);
     };
 
-    window.login = async function(){
+    // [2] Google 계정 로그인 (Firebase Auth)
+    window.login = async function() {
       try {
         const result = await signInWithPopup(auth, provider);
         const email = result.user.email;
         const domain = email.split("@")[1].toLowerCase();
 
-        if(!CONFIG.ALLOWED_DOMAINS.includes(domain)){
-          alert("시연용 기준 허용 도메인은 @sen.go.kr, @school.kr, @edu.sen.go.kr, @gmail.com 입니다.");
+        if (!CONFIG.ALLOWED_DOMAINS.includes(domain)) {
+          alert("허용된 도메인(@sen.go.kr, @school.kr, @edu.sen.go.kr, @gmail.com) 계정으로만 접속 가능합니다.");
           await signOut(auth);
           return;
         }
+
+        window.currentActiveUser = {
+          email: result.user.email,
+          name: result.user.displayName || email.split("@")[0],
+          isDemo: false
+        };
+        openApp(result.user.email);
+        subscribeAndLoadHistory();
       } catch (error) {
         console.error("로그인 에러:", error);
-        alert("로그인 중 오류가 발생했습니다.");
+        alert("구글 계정 로그인 중 오류가 발생했습니다. ('⚡ 시연용 계정 즉시 로그인'을 통해 바로 체험할 수도 있습니다.)");
       }
     };
 
-    window.logout = async function(){
+    // [3] 로그아웃
+    window.logout = async function() {
       try {
-        await signOut(auth);
+        if (auth.currentUser) {
+          await signOut(auth);
+        }
       } catch (error) {
         console.error("로그아웃 에러:", error);
-      }
-    };
-
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        openApp(user.email);
-        subscribeHistory();
-      } else {
+      } finally {
+        window.currentActiveUser = null;
         document.getElementById("appScreen").classList.add("hidden");
         document.getElementById("loginScreen").classList.remove("hidden");
         if (unsubscribe) {
@@ -847,168 +1340,475 @@
           unsubscribe = null;
         }
       }
+    };
+
+    // Firebase 상태 감지
+    onAuthStateChanged(auth, (user) => {
+      if (user && !window.currentActiveUser?.isDemo) {
+        window.currentActiveUser = {
+          email: user.email,
+          name: user.displayName || user.email.split("@")[0],
+          isDemo: false
+        };
+        openApp(user.email);
+        subscribeAndLoadHistory();
+      }
     });
 
-    function openApp(email){
+    function openApp(email) {
       document.getElementById("loginScreen").classList.add("hidden");
       document.getElementById("appScreen").classList.remove("hidden");
-      document.getElementById("userPill").textContent = `인증 계정: ${email}`;
+      const pill = document.getElementById("userPill");
+      if (pill) {
+        const isDemo = window.currentActiveUser?.isDemo;
+        pill.innerHTML = isDemo ? `⚡ 시연 계정: <strong>${email}</strong>` : `🟢 인증 계정: <strong>${email}</strong>`;
+      }
     }
 
+    // [4] 데이터 저장 및 불러오기 (Firestore + 로컬 스토리지 병합 관리로 100% 오류 방지)
     let unsubscribe = null;
     let historyList = [];
 
-    function subscribeHistory() {
-      const q = query(collection(db, "webtoons"), orderBy("createdAt", "desc"), limit(10));
-      unsubscribe = onSnapshot(q, (snapshot) => {
-        historyList = [];
-        snapshot.forEach((doc) => {
-          historyList.push(doc.data());
+    function subscribeAndLoadHistory() {
+      // 로컬 스토리지 데이터 먼저 로드
+      loadLocalHistory();
+
+      // Firebase Firestore 실시간 연동 시도
+      try {
+        const q = query(collection(db, "webtoons"), orderBy("createdAt", "desc"), limit(12));
+        unsubscribe = onSnapshot(q, (snapshot) => {
+          const firestoreItems = [];
+          snapshot.forEach((doc) => {
+            firestoreItems.push({ id: doc.id, ...doc.data() });
+          });
+          // 로컬 데이터와 합쳐서 중복 없이 렌더링
+          mergeAndRenderHistory(firestoreItems);
+        }, (error) => {
+          console.warn("Firestore 읽기 알림 (시연 모드 또는 규칙 보호):", error.message);
+          renderHistory();
         });
+      } catch (e) {
         renderHistory();
-      }, (error) => {
-        console.error("데이터 가져오기 에러:", error);
-        if (error.code === 'permission-denied') {
-          console.warn("Firestore 보안 규칙 때문에 데이터를 읽을 수 없습니다. Firebase 콘솔에서 보안 규칙을 설정해주세요.");
-        }
-      });
+      }
     }
 
-    function splitIntoScenes(text, cuts){
+    function loadLocalHistory() {
+      const saved = localStorage.getItem("portfolio2_webtoons");
+      if (saved) {
+        try { historyList = JSON.parse(saved); } catch (e) { historyList = []; }
+      }
+    }
+
+    function saveLocalHistory(item) {
+      historyList.unshift(item);
+      if (historyList.length > 20) historyList = historyList.slice(0, 20);
+      localStorage.setItem("portfolio2_webtoons", JSON.stringify(historyList));
+    }
+
+    function mergeAndRenderHistory(firestoreItems) {
+      const localOnly = historyList.filter(item => !firestoreItems.some(f => f.title === item.title && f.createdAtStr === item.createdAtStr));
+      historyList = [...firestoreItems, ...localOnly];
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const ul = document.getElementById("historyList");
+      if (!ul) return;
+      if (!historyList.length) {
+        ul.innerHTML = `<li style="text-align:center; color:var(--muted); padding:20px;">아직 생성된 작품이 없습니다. 위에서 스토리를 작성하고 생성해 보세요!</li>`;
+        return;
+      }
+      ul.innerHTML = historyList.map((item, idx) => `
+        <li onclick="loadSavedWebtoon(${idx})">
+          <div class="history-title">
+            <span>📚 ${item.title}</span>
+            <span class="card-title" style="font-size:12px;">${item.cuts}컷 · ${item.genre}</span>
+          </div>
+          <div class="history-meta">
+            <span>👤 작성자: ${item.createdBy || "시연 계정"}</span> &nbsp;|&nbsp;
+            <span>🕒 ${item.createdAtStr || "최근 생성"}</span>
+          </div>
+        </li>
+      `).join("");
+    }
+
+    window.loadSavedWebtoon = function(idx) {
+      const item = historyList[idx];
+      if (!item || !item.scenes) {
+        alert("이전 버전 기록이거나 상세 컷 데이터가 없습니다.");
+        return;
+      }
+      window.currentWebtoonData = item;
+      renderPanelGrid(item.scenes, item.genre, item.characters);
+      document.getElementById("bookViewAction").style.display = "block";
+      alert(`[${item.title}] 작품을 화면과 단행본 뷰어에 불러왔습니다.`);
+    };
+
+    // [5] 스토리 장면 분할 로직
+    function splitIntoScenes(text, cuts) {
       const cleaned = text.replace(/\n+/g, " ").trim();
       const sentences = cleaned.split(/(?<=[.!?]|다\.)\s+/).filter(Boolean);
       const base = sentences.length ? sentences : [cleaned];
-      const scenes = Array.from({length: cuts}, () => []);
+      const scenes = Array.from({ length: cuts }, () => []);
+      
       base.forEach((sentence, idx) => {
         scenes[idx % cuts].push(sentence);
       });
+      
       return scenes.map((group, index) => {
         const merged = group.join(" ").trim();
-        return merged || `장면 ${index + 1}의 핵심 사건`;
+        return merged || `제 ${index + 1}장: 주인공이 겪는 핵심 사건과 이야기의 전환`;
       });
     }
 
-    function shorten(text, length){
+    function shorten(text, length) {
       return text.length > length ? text.slice(0, length) + "..." : text;
     }
 
-    function makePrompt(genre, characters, scene){
-      return `${genre}, ${characters}, 학생용 웹툰 장면, 따뜻한 색감, 교육용 일러스트, ${scene}`;
+    // [6] 고품질 AI 일러스트 생성을 위한 영어 프롬프트 변환 로직
+    function getEnglishStyleTags(genre, characters, sceneText) {
+      let styleTag = "korean webtoon style, high quality anime illustration, vivid digital painting, detailed masterpiece";
+      if (genre.includes("역사")) {
+        styleTag = "korean webtoon style, historical adventure, traditional korean palace and costumes, cinematic lighting, masterpiece";
+      } else if (genre.includes("판타지")) {
+        styleTag = "anime fantasy illustration, korean webtoon style, magical atmosphere, glowing lights, vibrant colors, detailed art";
+      } else if (genre.includes("일상")) {
+        styleTag = "cheerful school slice of life anime illustration, korean webtoon style, bright cozy classroom, high detail";
+      } else if (genre.includes("환경")) {
+        styleTag = "korean webtoon style, eco friendly nature and hopeful green environment, bright anime illustration, digital art";
+      }
+      // 한국어 장면 키워드와 함께 영문 아트 스타일 조합
+      return `${styleTag}, scene of ${characters}, ${sceneText}`;
     }
 
-    window.generateWebtoon = async function(){
+    // [7] 이미지 생성이 실패할 경우를 완벽 대비하는 고품질 SVG 백업 렌더러
+    function createFallbackSvgUrl(index, sceneText, genre) {
+      const colors = [
+        ["#7c3aed", "#2563eb"], ["#db2777", "#7c3aed"],
+        ["#059669", "#0284c7"], ["#d97706", "#dc2626"]
+      ];
+      const [c1, c2] = colors[index % colors.length];
+      const safeText = shorten(sceneText.replace(/[<>&"]/g, ""), 45);
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="450" viewBox="0 0 600 450">
+        <defs>
+          <linearGradient id="g${index}" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="${c1}" stop-opacity="0.18"/>
+            <stop offset="100%" stop-color="${c2}" stop-opacity="0.25"/>
+          </linearGradient>
+        </defs>
+        <rect width="600" height="450" fill="url(#g${index})" />
+        <rect x="20" y="20" width="560" height="410" rx="20" fill="none" stroke="${c1}" stroke-width="3" stroke-dasharray="8 8" opacity="0.5"/>
+        <circle cx="300" cy="180" r="65" fill="${c1}" opacity="0.2"/>
+        <path d="M240 280 Q300 220 360 280 L360 380 L240 380 Z" fill="${c2}" opacity="0.25"/>
+        <text x="300" y="185" font-size="42" text-anchor="middle" fill="${c1}" font-weight="bold">SCENE #${index + 1}</text>
+        <rect x="50" y="320" width="500" height="80" rx="14" fill="#ffffff" opacity="0.95"/>
+        <text x="300" y="352" font-size="16" text-anchor="middle" fill="#1e293b" font-weight="bold">[ ${genre} ] AI 웹툰 장면</text>
+        <text x="300" y="380" font-size="14" text-anchor="middle" fill="#64748b">${safeText}</text>
+      </svg>`;
+      return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+    }
+
+    // [8] 웹툰 생성 코어 로직
+    window.generateWebtoon = async function() {
       const title = document.getElementById("titleInput").value.trim();
       const characters = document.getElementById("charactersInput").value.trim();
       const genre = document.getElementById("genreInput").value;
       const cuts = Number(document.getElementById("cutsInput").value);
       const story = document.getElementById("storyInput").value.trim();
 
-      if(!title || !characters || !story){
-        alert("작품 제목, 등장인물, 상세 스토리를 모두 입력해주세요.");
+      if (!title || !characters || !story) {
+        alert("작품 제목, 주요 등장인물, 구체적인 이야기 내용을 모두 입력해주세요.");
         return;
       }
 
       const scenes = splitIntoScenes(story, cuts);
       const panelGrid = document.getElementById("panelGrid");
-      
-      // 임시로 글로벌에 저장하여 '책 형태로 보기'에서 사용
-      window.currentWebtoonData = {
-        title,
-        scenes: scenes.map((scene, index) => ({
-          text: scene,
-          // 난수를 이용해 매번, 그리고 각 컷마다 다른 이미지를 가져오도록 함
-          imgUrl: `https://picsum.photos/seed/${Math.random().toString(36).substring(7)}/600/450`
-        }))
-      };
+      document.getElementById("bookViewAction").style.display = "block";
 
-      panelGrid.innerHTML = window.currentWebtoonData.scenes.map((data, index) => `
-        <div class="toon-panel">
-          <div class="toon-visual" style="padding:0; background:none;">
-            <img src="${data.imgUrl}" alt="Scene ${index+1}" style="width:100%; height:100%; object-fit:cover; display:block;">
-            <div class="toon-number" style="position:absolute; top:14px; left:14px; z-index:2;">${index + 1}</div>
+      // 1. 로딩 스켈레톤 화면 먼저 즉시 렌더링 (사용자가 이미지가 생성 중임을 확실히 인지)
+      panelGrid.innerHTML = scenes.map((scene, idx) => `
+        <div class="toon-panel" id="panel-${idx}">
+          <div class="toon-visual">
+            <div class="skeleton-loader" id="loader-${idx}">
+              <div class="spinner"></div>
+              <div style="font-weight:800; font-size:14px; color:var(--primary-dark);">🎨 ${idx + 1}컷 AI 일러스트 렌더링 중...</div>
+              <div style="font-size:12px; color:var(--muted);">잠시만 기다려주세요 (약 5~10초)</div>
+            </div>
           </div>
           <div class="toon-body">
-            <h4>${index + 1}컷 · ${shorten(data.text, 18)}</h4>
-            <p><strong>간단한 이야기 내용</strong><br>${data.text}</p>
-            <p><strong>이미지 프롬프트</strong><br>${makePrompt(genre, characters, shorten(data.text, 80))}</p>
+            <h4>${idx + 1}컷 · ${shorten(scene, 18)}</h4>
+            <p><strong>📜 이야기 내용</strong><br>${scene}</p>
+            <div class="prompt-box">💬 <strong>AI 연출 키워드:</strong> ${genre}, ${characters}, ${shorten(scene, 40)}</div>
           </div>
         </div>
       `).join("");
-      
-      document.getElementById("bookViewAction").style.display = "block";
 
+      const generatedScenes = [];
+
+      // 2. 각 컷마다 Pollinations AI 실시간 이미지 로드 (실패 시 즉시 고품질 SVG 백업 전환)
+      const imagePromises = scenes.map((sceneText, idx) => {
+        return new Promise((resolve) => {
+          const promptTags = getEnglishStyleTags(genre, characters, sceneText);
+          const seed = Date.now() + idx * 777;
+          const aiUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(promptTags)}?width=600&height=450&nologo=true&seed=${seed}`;
+          const fallbackUrl = createFallbackSvgUrl(idx, sceneText, genre);
+
+          const img = new Image();
+          let resolved = false;
+
+          // 타임아웃 12초 설정
+          const timer = setTimeout(() => {
+            if (!resolved) {
+              resolved = true;
+              finishScene(idx, fallbackUrl, sceneText);
+              resolve();
+            }
+          }, 12000);
+
+          img.onload = () => {
+            if (!resolved) {
+              resolved = true;
+              clearTimeout(timer);
+              finishScene(idx, aiUrl, sceneText);
+              resolve();
+            }
+          };
+
+          img.onerror = () => {
+            if (!resolved) {
+              resolved = true;
+              clearTimeout(timer);
+              finishScene(idx, fallbackUrl, sceneText);
+              resolve();
+            }
+          };
+
+          img.src = aiUrl;
+        });
+      });
+
+      function finishScene(idx, finalImgUrl, text) {
+        generatedScenes[idx] = { text, imgUrl: finalImgUrl };
+        const visualWrap = document.querySelector(`#panel-${idx} .toon-visual`);
+        if (visualWrap) {
+          visualWrap.innerHTML = `
+            <img src="${finalImgUrl}" alt="Scene ${idx + 1}" style="animation: fadeIn 0.4s ease;">
+            <div class="toon-number">${idx + 1}</div>
+          `;
+        }
+      }
+
+      // 이미지 렌더링 완료 대기 및 전역 데이터 보존
+      await Promise.all(imagePromises);
+
+      const now = new Date();
+      const formatter = new Intl.DateTimeFormat("ko-KR", {
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+      });
+      const createdAtStr = formatter.format(now);
+      const userEmail = window.currentActiveUser?.email || "demo@school.kr";
+
+      window.currentWebtoonData = {
+        title, characters, genre, cuts,
+        createdAtStr, createdBy: userEmail,
+        scenes: generatedScenes
+      };
+
+      // 로컬 스토리지에 즉시 저장 (100% 저장 기능 보장)
+      saveLocalHistory(window.currentWebtoonData);
+
+      // Firestore 클라우드 저장 시도 (시연 계정이거나 규칙 거부 시에도 에러 없이 안전하게 처리)
       try {
-        const now = new Date();
-        const formatter = new Intl.DateTimeFormat("ko-KR", {
-          year: 'numeric', month: '2-digit', day: '2-digit',
-          hour: '2-digit', minute: '2-digit', second: '2-digit'
-        });
-        
-        await addDoc(collection(db, "webtoons"), {
-          title,
-          cuts,
-          genre,
-          createdAt: serverTimestamp(),
-          createdAtStr: formatter.format(now),
-          createdBy: auth.currentUser.email
-        });
-
+        if (auth.currentUser) {
+          await addDoc(collection(db, "webtoons"), {
+            title, characters, genre, cuts,
+            scenes: generatedScenes,
+            createdAt: serverTimestamp(),
+            createdAtStr, createdBy: userEmail
+          });
+        }
       } catch (error) {
-        console.error("데이터 저장 에러:", error);
-        alert("기록 저장 중 오류가 발생했습니다. (Firestore 설정 및 보안 규칙을 확인하세요)");
+        console.log("Firestore 클라우드 동기화 안내:", error.message);
       }
     };
 
-    function renderHistory(){
-      const ul = document.getElementById("historyList");
-      if(!historyList.length){
-        ul.innerHTML = "<li>아직 생성 기록이 없습니다. (혹은 Firestore 규칙 설정 필요)</li>";
-        return;
-      }
-      ul.innerHTML = historyList.map(item => `
-        <li>
-          <strong>${item.title}</strong> · ${item.cuts}컷 · ${item.genre}<br>
-          <span style="color:#64748b;">${item.createdAtStr || "방금 전"}</span>
-        </li>
+    function renderPanelGrid(scenesData, genre, characters) {
+      const panelGrid = document.getElementById("panelGrid");
+      if (!panelGrid) return;
+      panelGrid.innerHTML = scenesData.map((data, idx) => `
+        <div class="toon-panel">
+          <div class="toon-visual">
+            <img src="${data.imgUrl}" alt="Scene ${idx + 1}">
+            <div class="toon-number">${idx + 1}</div>
+          </div>
+          <div class="toon-body">
+            <h4>${idx + 1}컷 · ${shorten(data.text, 18)}</h4>
+            <p><strong>📜 이야기 내용</strong><br>${data.text}</p>
+            <div class="prompt-box">💬 <strong>AI 연출 키워드:</strong> ${genre}, ${characters}, ${shorten(data.text, 40)}</div>
+          </div>
+        </div>
       `).join("");
     }
 
-    // Modal Control
-    window.openModal = function(id) {
-      document.getElementById(id).classList.add('show');
-    };
-    
-    window.closeModal = function(id) {
-      document.getElementById(id).classList.remove('show');
-    };
-    
-    window.handleModalClick = function(event, id) {
-      if (event.target.id === id) {
-        closeModal(id);
-      }
-    };
-    
+    // [9] 책 형태로 보기 (Storybook / Flipbook Reader) 모드 제어
+    window.currentBookPage = 0; // 0: 표지, 1..N: 컷 페이지
+    window.isBookScrollMode = false;
+
     window.openBookView = function() {
-      if (!window.currentWebtoonData) return;
-      
-      document.getElementById("bookModalTitle").textContent = window.currentWebtoonData.title;
-      const viewer = document.getElementById("bookViewer");
-      
-      viewer.innerHTML = window.currentWebtoonData.scenes.map((data, index) => `
-        <div class="book-page">
-          <img class="book-image" src="${data.imgUrl}" alt="Scene ${index + 1}">
-          <div class="book-text">
-            <strong>제 ${index + 1}장</strong><br>
-            ${data.text}
-          </div>
-        </div>
-      `).join("");
-      
-      openModal('bookModal');
+      if (!window.currentWebtoonData) {
+        alert("먼저 웹툰 컷을 생성해 주세요!");
+        return;
+      }
+      window.currentBookPage = 0;
+      window.isBookScrollMode = false;
+      document.getElementById("modeToggleBtn").textContent = "📜 전체 스크롤 보기로 전환";
+      document.getElementById("bookNavBar").style.display = "flex";
+      renderBookPage();
+      openModal("bookModal");
     };
 
-    setLogos();
-    setLinks();
+    window.changeBookPage = function(delta) {
+      const totalPages = window.currentWebtoonData.scenes.length;
+      window.currentBookPage += delta;
+      if (window.currentBookPage < 0) window.currentBookPage = 0;
+      if (window.currentBookPage > totalPages) window.currentBookPage = totalPages;
+      renderBookPage();
+      const viewer = document.getElementById("bookViewer");
+      if (viewer) viewer.scrollTop = 0;
+    };
+
+    window.goToBookCover = function() {
+      window.currentBookPage = 0;
+      renderBookPage();
+    };
+
+    window.toggleBookMode = function() {
+      window.isBookScrollMode = !window.isBookScrollMode;
+      const btn = document.getElementById("modeToggleBtn");
+      const nav = document.getElementById("bookNavBar");
+      if (window.isBookScrollMode) {
+        btn.textContent = "📑 페이지 넘기기 모드로 전환";
+        nav.style.display = "none";
+        renderBookScrollAll();
+      } else {
+        btn.textContent = "📜 전체 스크롤 보기로 전환";
+        nav.style.display = "flex";
+        renderBookPage();
+      }
+    };
+
+    function renderBookPage() {
+      const data = window.currentWebtoonData;
+      const viewer = document.getElementById("bookViewer");
+      const counter = document.getElementById("pageCounter");
+      const prevBtn = document.getElementById("prevPageBtn");
+      const nextBtn = document.getElementById("nextPageBtn");
+      if (!viewer || !data) return;
+
+      const totalPages = data.scenes.length;
+
+      if (window.currentBookPage === 0) {
+        // 책 표지 (Cover Page)
+        counter.textContent = "📕 책 표지";
+        prevBtn.disabled = true;
+        nextBtn.disabled = false;
+        viewer.innerHTML = `
+          <div class="book-page-card book-cover">
+            <span class="book-cover-badge">🏫 서울풍납초등학교 AI 웹툰 창작소 출판 단행본</span>
+            <h1>${data.title}</h1>
+            <div class="book-cover-meta">
+              <strong>🏷️ 장르:</strong> ${data.genre} &nbsp;|&nbsp; <strong>🖼️ 구성:</strong> 총 ${data.cuts}컷<br>
+              <strong>👥 등장인물:</strong> ${data.characters}<br>
+              <strong>✍️ 작가:</strong> ${data.createdBy}
+            </div>
+            <div style="margin:24px auto; width:min(500px, 100%); aspect-ratio:16/10; border-radius:18px; overflow:hidden; box-shadow:0 12px 24px rgba(0,0,0,0.1); border:1px solid var(--line);">
+              <img src="${data.scenes[0]?.imgUrl || CONFIG.LOGO_URL}" style="width:100%; height:100%; object-fit:cover;">
+            </div>
+            <button class="btn btn-primary" style="padding:14px 28px; font-size:16px; margin-top:10px;" onclick="changeBookPage(1)">
+              📖 제 1장 펼치기 (이야기 시작) ▶
+            </button>
+          </div>
+        `;
+      } else {
+        // 본문 컷 페이지
+        const idx = window.currentBookPage - 1;
+        const scene = data.scenes[idx];
+        counter.textContent = `${window.currentBookPage} / ${totalPages} 페이지`;
+        prevBtn.disabled = false;
+        nextBtn.disabled = (window.currentBookPage === totalPages);
+
+        viewer.innerHTML = `
+          <div class="book-page-card">
+            <div class="book-page-header">
+              <span>📚 ${data.title}</span>
+              <span>제 ${idx + 1}장 (${idx + 1} / ${totalPages})</span>
+            </div>
+            <div class="book-page-image-wrap">
+              <img src="${scene.imgUrl}" alt="Scene ${idx + 1}">
+            </div>
+            <div class="book-page-body">
+              <h4>제 ${idx + 1}장 · 사건 전개</h4>
+              <div class="book-page-story">📜 ${scene.text}</div>
+              <div class="book-page-prompt">💡 <strong>AI 장면 연출 정보:</strong> ${data.genre}, ${data.characters}, ${shorten(scene.text, 50)}</div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function renderBookScrollAll() {
+      const data = window.currentWebtoonData;
+      const viewer = document.getElementById("bookViewer");
+      if (!viewer || !data) return;
+
+      let html = `
+        <div class="book-page-card book-cover" style="margin-bottom:28px;">
+          <span class="book-cover-badge">🏫 서울풍납초등학교 AI 웹툰 창작소 출판 단행본</span>
+          <h1>${data.title}</h1>
+          <div class="book-cover-meta">
+            <strong>🏷️ 장르:</strong> ${data.genre} &nbsp;|&nbsp; <strong>🖼️ 구성:</strong> 총 ${data.cuts}컷<br>
+            <strong>👥 등장인물:</strong> ${data.characters} &nbsp;|&nbsp; <strong>✍️ 작가:</strong> ${data.createdBy}
+          </div>
+        </div>
+      `;
+
+      data.scenes.forEach((scene, idx) => {
+        html += `
+          <div class="book-page-card" style="margin-bottom:28px;">
+            <div class="book-page-header">
+              <span>📚 ${data.title}</span>
+              <span>제 ${idx + 1}장</span>
+            </div>
+            <div class="book-page-image-wrap">
+              <img src="${scene.imgUrl}" alt="Scene ${idx + 1}">
+            </div>
+            <div class="book-page-body">
+              <h4>제 ${idx + 1}장 · 사건 전개</h4>
+              <div class="book-page-story">📜 ${scene.text}</div>
+              <div class="book-page-prompt">💡 <strong>AI 장면 연출 정보:</strong> ${data.genre}, ${data.characters}, ${shorten(scene.text, 50)}</div>
+            </div>
+          </div>
+        `;
+      });
+
+      viewer.innerHTML = html;
+    }
+
+    // 모달 제어 함수
+    window.openModal = function(id) {
+      document.getElementById(id)?.classList.add("show");
+    };
+    window.closeModal = function(id) {
+      document.getElementById(id)?.classList.remove("show");
+    };
+    window.handleModalClick = function(event, id) {
+      if (event.target.id === id) closeModal(id);
+    };
+
+    // 초기 실행
+    setLogosAndLinks();
+    subscribeAndLoadHistory();
   </script>
 </body>
 </html>
